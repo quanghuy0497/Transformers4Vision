@@ -1,3 +1,8 @@
+## About
+Summary Transformer-based architectures for Computer Vision. Focusing on object detection, segmentation, and few-shot segmentation.
+
+Keep updated
+
 ## Table of contents
 * [Standard Transformer](#Standard-Transformer)
 	* [Original Transformer](#Original-Transformer)
@@ -124,7 +129,7 @@
 		- Not necessary for semantic segmentation
 		- The resolution of PS is fixed => needs to be interpolated when facing different test resolutions => dropped accuracy
 + **Hierarchical Transformer Encoder**: extract coarse and fine-grained features, partly inspired by ViT but optimized for semantic segmentation
-	- Overlap patch embeddings => [**_Transformer Block_** => Downsampling]x 4 times => CNN-like multi-level feature map `Fi`
+	- Overlap patch embeddings => [**_Transformer Block_** => Downsampling] x 4 times => CNN-like multi-level feature map `Fi`
 		- Feature map size: `[H, W, 3]` => `F1` `[H/4, W/4, C1]` => `F2` `[H/8, W/8, C2]` => ... => `F4` `[H/32, W/32, C4]`
 			- Provide both high and low-resolution features => boost the performance of semantic segmentation
 		- Transformer Block1: Efficient Self-Atnn => Mix-FNN => Overlap Patch Merging
