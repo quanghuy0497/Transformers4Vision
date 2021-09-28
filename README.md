@@ -151,7 +151,7 @@
 		- Can aggregate multiple support classes simultaneously => capture inter-class correlations => reduce misclassification, enhance generalization
 	- Pipeline:
 		- Query & Support features => MHA => ROIAlign + Average pooling (on the support feature only) => Query feature map `Q` & Support prototypes `S` 
-		- `S` = Concat(`S`, BG-Prototype); `T` (Task Encodings) = Concat(`T`, BG-Encoding)
+		- `S` = Concat(`S`, BG-Prototype); Task Encodings `T` = Concat(`T`, BG-Encoding)
 		- [`Q`, `S`, `T`] => Feature maching & Encoding matching (in parallel) => FFN => Support-Aggregated Query Features
 	- **_Feature matching_**:
 		- [`Q`, Sigmoid(`S`), `S`] => Single-Head Attention => Element-wise multiplication => feature matching output `Qf`
@@ -164,8 +164,8 @@
 		- Adapt Multi-scale deformable attention, with the CAM is counted as one encoder layer
 	- Support-Aggregated Query features => Encoder-Decoder => Embedding `E`
 + **Prediction Head**:
-	- `E` => FC,Sigmoid => Confidence score
-	- `E` => FC,ReLU + FC,ReLU + FC,Sigmoid => Bounding Box
+	- `E` => FC, Sigmoid => Confidence score
+	- `E` => FC, ReLU + FC, ReLU + FC, Sigmoid => Bounding Box
 + **Code**: https://github.com/ZhangGongjie/Meta-DETR
 
 ### Boosting Few-shot Semantic Segmentation with Transformers
@@ -179,15 +179,17 @@
 + **Multi-scale Processing**:
 	- Information over different scales (of the input feature maps `X` from support/query images) can be utilized
 	- Multi-scaling with Global Average Pooling => feature Pyramid `Xi` = {X1, X2,...,Xn}
-+ **Global Enhancement Module** (GEM):
++ **Global Enhancement Module (GEM)**:
 	- Using **_Transformer_** => enhance the feature to exploit the global information
 	- `Xi` => FC layer (for channel reduction) => `X'i` => **_Feature Merging Unit_** (FMU) => `Yi`
-		- FMU: `Yi` =  {`X'i` if i=1; [Conv1x1(*Concat*(`X'i`, `Ti-1`)) + `X'i`] if i>1}
+		- FMU: 
+			- `Yi` =  `X'i` if i=1; 
+			- `Yi` =  (Conv1x1(*Concat*(`X'i`, `Ti-1`)) + `X'i`) if i>1
 	- `Yi` => [**_MHA_** => MLP (2 Linear)] => MHA => `Ti` => `T`
 		- MHA with GELU and Norm
 		- [MHA => MLP] repeat L times with L = 3
 		- `T` = = *Concat*(T1, T2,...Tn) at layer L
-+ **Local Enhancement Module** (LEM):
++ **Local Enhancement Module (LEM)**:
 	- Follow the same pipeline as GEM:
 		- `Xi` => FC layer => FMU => `Yi` => Conv => output
 	- Rather than using transformer in GEM, LEM using **_Convolutional_** => encode the local information
@@ -209,14 +211,14 @@
 		- Flatten query feature as input (query only)
 		- Pixel-wise feature of query images => aggregate their global context information
 	+ **_Cross-alignment block_**:
-		- Replace MHA with CyC-MHA
+		- Replace MHA with **_CyC-MHA_**
 		- Flatten query feature and sample of support feature as input
 		- Performs attention between query and support pixel-wise features => aggregate relevant support feature into query ones
-	+ **_Cycle-Consistent Multi-head Attention_** (CyC-MHA):
+	+ **_Cycle-Consistent Multi-head Attention (CyC-MHA)_**:
 		- Alleviate the excessive harmful support features that confuse pure pixel-level attention
 		- Pipeline:
 			-  Affinity map A is calculated => measure the correspondence relationship between all query and support tokens
-			- For a single token position j (j={0,...Ns}), its moist similar oint `i*` = argmax A(`i`,`j`) with i={0,...HqWq} is the index of flatten query feature
+			- For a single token position j (j={0,...Ns}), its most similar point `i*` = argmax A(`i`,`j`) with i={0,...HqWq} is the index of flatten query feature
 			- Construct **_Cycle-consistency_** (CyC) relationship for all tokens in the support sequence
 				- The cycle-consistency help avoids being bias by possible harmful feature effectively (facing when training for few-shot segmentation)
 			- Finally, CyC-MHA = softmax(Ai + B)V
@@ -227,14 +229,14 @@
 	- Output of CyC-MHA => reshaping to spatial dimensions => Conv-Head (Cov3x3 => ReLu => Conv1x1) => Segmentation Mask
 + **Code**: To be updated
 
-### [Few-shot Semantic Segmentation with Classifier Weight Transformer
+### Few-shot Semantic Segmentation with Classifier Weight Transformer
 + **Paper**: https://arxiv.org/pdf/2108.03032.pdf  
 ![](Images/CWT.png)  
 + **Architecture**:
-	- **_First stage_**: pre-train encoder/decoder (PSPNet pre-trained on ImageNet) with supervised learning => stronger representation
-		- Support/Query Image => **_Encoder-Decoder_** => Linear clasifier with Support Mask (Support only) => Classifier (Support only) => [Classifier weight `Q`, Query feature `K`, Query feature `V`]
+	- **_First stage_**: pre-train encoder/decoder (**PSPNet** pre-trained on ImageNet) with supervised learning => stronger representation
+		- Support/Query Image => Encoder-Decoder (**PSPNet**) => Linear clasifier with Support Mask (Support only) => Classifier (Support only) => [Classifier weight `Q`, Query feature `K`, Query feature `V`]
 	- **_Second stage_**: meta-train the Classifier Weight Transformer (CWT) only (as the encoder-decoder capapble to capture generalization of unseen class)
-		- [`Q`,`K`,`V`] => CWT: Skip_Connection[Linear => MHA => Norm] => Conv (with `Q`) => Prediction Mask
+		- [`Q`,`K`,`V`] => Skip_Connection[Linear => MHA => Norm] => Conv operation with `Q` => Prediction Mask
 + **Code**: https://github.com/zhiheLu/CWT-for-FSS
 
 ## Resource
