@@ -73,8 +73,8 @@
 ### AnchorDETR
 + **Paper**: https://arxiv.org/pdf/2109.07107.pdf  
 ![](Images/AnchorDETR.png)  
-+ Backbone: ResNet40
-+ The encoder/decoder share the same structure as DETE
++ **Backbone**: ResNet40
++ The encoder/decoder share the same structure as DETR
 	- However, the self-attention in the encoder and  decoder blocks are replaced by Row-Column Decouple Attention
 + **Row-Column Decouple Attention**:
 	- Help reduce the GPU memeory when facing with high-resolution feature
