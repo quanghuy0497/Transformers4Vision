@@ -7,7 +7,7 @@ Keep updated
 * [Standard Transformer](#Standard-Transformer)
 	* [Original Transformer](#Original-Transformer)
 	* [ViT (Vision Transformer)](#ViT-Vision-Transformer)
-* [Object Detection/Segmentation Transformer](#Object-Detection-Segmentation-Transformer)
+* [Object Detection/Segmentation Transformer](#Object-DetectionSegmentation-Transformer)
 	* [DETR (Detection Transformer)](#DETR-Detection-Transformer)
 	* [AnchorDETR](#AnchorDETR)
 	* [MaskFormer](#MaskFormer)
