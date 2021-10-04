@@ -16,7 +16,7 @@ Keep updated
 	* [TransUNet](#TransUNet)
 	* [SegFormer](#SegFormer)
 	* [Fully Transformer Networks (FTN)](#Fully-Transformer-Networks-FTN)
-	* [SOTR (Segmenting Objects with Transformer)](#SORT-Segmenting-Objects-with-Transformer)
+	* [SOTR (Segmenting Objects with Transformer)](#SOTR-Segmenting-Objects-with-Transformer)
 	* [UTNet](#UTNet)
 	* [HandsFormer](#HandsFormer)
 * [Few-shot Transformer](#Few-shot-transformer)
@@ -391,3 +391,12 @@ Keep updated
 	- https://github.com/dk-liang/Awesome-Visual-Transformer
 	- https://github.com/DirtyHarryLYL/Transformer-in-Vision
 	- https://github.com/Yangzhangcst/Transformer-in-Computer-Vision
+
+
+
+
+
+
+<br><br>
+<br><br>
+These notes were created by [quanghuy0497](https://github.com/quanghuy0497/Transformer4Vision)@2021
