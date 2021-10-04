@@ -13,10 +13,10 @@ Keep updated
 	* [DETR (Detection Transformer)](#DETR-Detection-Transformer)
 	* [AnchorDETR](#AnchorDETR)
 	* [MaskFormer](#MaskFormer)
-	* [TransUNet](#TransUNet)
 	* [SegFormer](#SegFormer)
 	* [Fully Transformer Networks](#Fully-Transformer-Networks)
 	* [SOTR (Segmenting Objects with Transformer)](#SOTR-Segmenting-Objects-with-Transformer)
+	* [TransUNet](#TransUNet)
 	* [UTNet (U-shape Transformer Networks)](#UTNet-U-shape-Transformer-Networks)
 	* [HandsFormer](#HandsFormer)
 * [Few-shot Transformer](#Few-shot-transformer)
@@ -145,23 +145,6 @@ Keep updated
 	- *Matrix_mul*(Mask predictions, class predictions) => Segmantic segmentation
 + **Code**: https://github.com/facebookresearch/MaskFormer
 
-### TransUNet
-+ **Paper**: https://arxiv.org/pdf/2102.04306.pdf  
-![](Images/TransUNet.png)  
-+ **Downsampling (Encoder)**: using CNN-Transformer Hybrid
-	+ (Medical) Image `[H, W, C]` => _**CNN**_ => 2D feature map => _**Linear Projection**_ (Flatten into 2D Patch embedding) => Downsampling => _**Tranformer**_ => Hidden feature `[n_patch, D]`
-		- CNN: downsampling by 1/2 => 1/4 => 1/8
-		- Transformer: Norm layer *before* MHSA/FFN (rather than applying Norm layer after MHSA/FFN like the original Transformer), total 12 layers
-	+ Why using CNN-Transformer hybrid:
-		- Leverages the intermediate high-resolution CNN feature maps in the Decoder
-		- Performs better than the purge transformer
-+ **Upsamling (Decoder)**: using Cascaded Upsampler 
-	- Similar to the upsamling part of the [standard UNet](https://github.com/quanghuy0497/Deep-Learning-Specialization/tree/main/Course%204%20-%20Convolutional%20Neural%20Networks#u-net-architecture)
-		- **_Upsampling_** => *concat* with corresponded CNN feature map (from the Encoder) => *Conv3x3 with ReLu*
-		- **_Segmentation head_** (Conv1x1) at the final layer
-	- Hidden Feature `[n_patch, D]` => reshape `[D, H/16, W/16]` => `[512, H/16, H/16]` => `[256, H/8, W/8]` => `[128, H/4, W/4]` => `[64, H/2, W/2]` => `[16, H, W]` => Segmentation head => Segmantic Segmentation
-+ **Code**: https://github.com/KenzaB27/TransUnet
-
 ### SegFormer
 + **Paper**: https://arxiv.org/pdf/2105.15203.pdf  
 ![](Images/SegFormer.png)  
@@ -225,6 +208,23 @@ Keep updated
 			- Hybrid Twin comes with the best performance
 	+  **_Multi-level upsampling model_**: P5 feature map + Positional from transformer + P2-P4 from FPN => [Conv3x3 => Group Norm => Relu, multi stage] => upsample x2, x4, x8 (for P3-P5) => added together => point-wise conv => upsamping => final `HxW` feature map
 + **Code**: https://github.com/easton-cau/SOTR
+
+### TransUNet
++ **Paper**: https://arxiv.org/pdf/2102.04306.pdf  
+![](Images/TransUNet.png)  
++ **Downsampling (Encoder)**: using CNN-Transformer Hybrid
+	+ (Medical) Image `[H, W, C]` => _**CNN**_ => 2D feature map => _**Linear Projection**_ (Flatten into 2D Patch embedding) => Downsampling => _**Tranformer**_ => Hidden feature `[n_patch, D]`
+		- CNN: downsampling by 1/2 => 1/4 => 1/8
+		- Transformer: Norm layer *before* MHSA/FFN (rather than applying Norm layer after MHSA/FFN like the original Transformer), total 12 layers
+	+ Why using CNN-Transformer hybrid:
+		- Leverages the intermediate high-resolution CNN feature maps in the Decoder
+		- Performs better than the purge transformer
++ **Upsamling (Decoder)**: using Cascaded Upsampler 
+	- Similar to the upsamling part of the [standard UNet](https://github.com/quanghuy0497/Deep-Learning-Specialization/tree/main/Course%204%20-%20Convolutional%20Neural%20Networks#u-net-architecture)
+		- **_Upsampling_** => *concat* with corresponded CNN feature map (from the Encoder) => *Conv3x3 with ReLu*
+		- **_Segmentation head_** (Conv1x1) at the final layer
+	- Hidden Feature `[n_patch, D]` => reshape `[D, H/16, W/16]` => `[512, H/16, H/16]` => `[256, H/8, W/8]` => `[128, H/4, W/4]` => `[64, H/2, W/2]` => `[16, H, W]` => Segmentation head => Segmantic Segmentation
++ **Code**: https://github.com/KenzaB27/TransUnet
 
 ### UTNet (U-shape Transformer Networks)
 + **Paper**: https://arxiv.org/pdf/2107.00781.pdf  
