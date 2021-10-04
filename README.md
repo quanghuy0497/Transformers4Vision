@@ -369,7 +369,7 @@ Keep updated
 				- With A^ is the common attention, A is the standard atteention, I1, I2 are 2 inputs
 			- Common attention aligns each query clip feature with its previous clip features => contain more motion information => benefit the common action localization
 	+ **_Few-shot Transformer (FST)_**:    
-	![](Images/Few_shot_Transformer_detailed.png)   
+	![](Images/Few_Shot_Transformer_detailed.png)   
 		- _Encoder_: standard architecture with MHSA. The input is supplied with fixed spatio-temporal positional encoding.
 			- Support branch: the support video => encoder one by one => concat => `Es` => decoder (along with `Eq`)
 			- Quary branch: enhanced query clip => encoder => `Eq` => decoder
