@@ -7,20 +7,31 @@ Keep updated
 * [Standard Transformer](#Standard-Transformer)
 	* [Original Transformer](#Original-Transformer)
 	* [ViT (Vision Transformer)](#ViT-Vision-Transformer)
+	* [VTN (Video Transformer Network)](#VTN-Video-Transformer-Network)
+	* [ViTGAN](#VitGAN)
 * [Object Detection/Segmentation Transformer](#Object-DetectionSegmentation-Transformer)
 	* [DETR (Detection Transformer)](#DETR-Detection-Transformer)
 	* [AnchorDETR](#AnchorDETR)
 	* [MaskFormer](#MaskFormer)
 	* [TransUNet](#TransUNet)
 	* [SegFormer](#SegFormer)
+	* [Fully Transformer Networks (FTN)](#Fully-Transformer-Networks-FTN)
+	* [SOTR (Segmenting Objects with Transformer)](SORT-Sementing-Objects-with-Transformer)
+	* [UTNet](#UTNet)
+	* [HandsFormer](#HandsFormer)
 * [Few-shot Transformer](#Few-shot-transformer)
 	* [Meta-DETR: Image-Level Few-Shot Object Detection with Inter-Class Correlation Exploitation](#Meta-DETR-Image-Level-Few-Shot-Object-Detection-With-Inter-Class-Correlation-Exploitation)
 	* [Boosting Few-shot Semantic Segmentation with Transformers](#Boosting-Few-shot-Semantic-Segmentation-with-Transformers)
 	* [Few-Shot Segmentation via Cycle-Consistent Transformer](#Few-Shot-Segmentation-via-Cycle-Consistent-Transformer)
 	* [Few-shot Semantic Segmentation with Classifier Weight Transformer](#Few-shot-Semantic-Segmentation-with-Classifier-Weight-Transformer)
+	* [Few-shot Transformation of Common Actions into Time and Space](#Few-shot-Transformation-of-Common-Actions-into-Time-And-Space)
+* [Other](#Other)
+	* [Do Vision Transformer see like CNN](#Do-Vision-Transformer-see-like-CNN)
+	* [Unifying Global-Local Representations in Salient Object Detection with Transformer](#Unifying-Global-Local-Representations-in-Salient-Object-Detection-with-Transformer)
 * [Resource](#Resource)
 
 ## Standard Transformer
+
 ### Original Transformer
 + **Paper**: https://arxiv.org/abs/1706.03762
 ![](Images/Transformer.png)  
@@ -28,17 +39,19 @@ Keep updated
 	- Sequence embedding (e.g. word embeddings of a sentence)
 	- Positional Encoding => encode the _positions of embedding word within the sentence_ in the input of Encoder/Decoder block
 + **Encoder**:
-	- Embedding words => Skip_Connection[**_MHA_** => Norm] => Skip_Connection[**_FFN_** => Norm] => Encoder output
-		- **_MHA_**: Multi-Head Self Attention
+	- Embedding words => Skip_Connection[**_MHSA_** => Norm] => Skip_Connection[**_FFN_** => Norm] => Encoder output
+		- **_MHSA_**: Multi-Head Self Attention
 		- **_FFN_**: FeedForward Neural Network
 	+ Repeat N times (N usually 6)
 + **Decoder**:
 	- Decoder input:
 		- Leaned output of the decoder (initial token in the begining, learned sentence throughout the process)
 		- Encoder input (put in the middle of the Decoder)
-	- (Input + Positional Encoding) => Skip_Connection[**_MHA_** + Norm] => Skip_Connection[(+Encoder input) => **_MHA_** => Norm] => Skip_Connection[**_FFN_** + Norm] => Linear => Softmax => Decoder Output
+	- (Input + Positional Encoding) => Skip_Connection[**_MHSA_** + Norm] => Skip_Connection[(+Encoder input) => **_MHSA_** => Norm] => Skip_Connection[**_FFN_** + Norm] => Linear => Softmax => Decoder Output
 	- Using the decoder output as the input for next round, repeat N times (N ussually 6)
 + [Read here](https://github.com/quanghuy0497/Deep-Learning-Specialization/tree/main/Course%205%20-%20Sequence%20Models#transformer-network-1) for more detail
+	+ Also [here](https://phamdinhkhanh.github.io/2019/06/18/AttentionLayer.html) if you prefer  detailed explanation in Vienamese
++ **Codes**: https://github.com/SamLynnEvans/Transformer
 
 ### ViT (Vision Transformer)
 + **Paper**: https://arxiv.org/pdf/2010.11929.pdf
@@ -48,12 +61,40 @@ Keep updated
 	- **_Positional encoding_** added to the patch embeddings for location information of the patchs sequence
 	- Extra learnable `[Cls]` token (embedding) + positional 0 => attached on the head of the embedding sequence (denote as `Z0`)
 + **Architecture**: (Patch + Position Embedding) => Transformer Encoder => MLP Head for Classification
-	-  **_Transformer Encoder_**: Skip_Connection[Norm => **_MHA_**] => Skip_Connection[Norm + **_MLP_**(Linear, GELU, Linear)] => output
+	-  **_Transformer Encoder_**: Skip_Connection[Norm => **_MHSA_**] => Skip_Connection[Norm + **_MLP_**(Linear, GELU, Linear)] => output
 	- **_MLP Head for classification_**:  `C0` (output of `Z0` after went through the Transformer Encoder) => **_MLP Head_** (Linear + Softmax) => classified label
 + **Good video explanation**: https://www.youtube.com/watch?v=HZ4j_U3FC94
 + **Code**: https://github.com/lucidrains/vit-pytorch
 
+### VTN (Video Transformet Network)
++ **Paper**: https://arxiv.org/pdf/2102.00719.pdf  
+![](Images/VTN.png)  
++ Based on [Longformer](https://arxiv.org/pdf/2004.05150.pdf) (transformer-based model can process a long sequence of thousands of tokens)
++ **Pipeline**: Quite similar to the standard ViT
+	- **_The 2D spatial backbone_** `f(x)` can be replaced with any given backbone for 2D images => feature extraction
+	- **_The temporal attention-based encoder_** can stack up more layers, more heads, or can be set to a different Transformers model that can process long sequences. 
+		- Note that a special classification token `[CLS]` is added in front of the feature sequence => final representation of the video => classification task head for video classifies
+	- **_The classification head_** can be modified to facilitate different video-based tasks, i.e. temporal action localization
++ **Code**: https://github.com/bomri/SlowFast/tree/master/projects/vtn
+
+### ViTGAN
++ **Paper**: https://arxiv.org/pdf/2107.04589.pdf  
+![](Images/ViTGAN.png)  
++ Both the generator and the discrimiator are designed based on the stadard ViT, but with modifications
++ **Architecture**:
+	+ **_Generator_**: Input latent `z` => _Mapping Network_ (MLP) => latent vector `w` => _Affine transform_ `A` => _Transformer Encoder_ => _Fourier Encoding_ (sinusoidal/sine activation) => `E_fou` => _2-layer MPL_ => Generated Patches
+		- **_Transformer Encoder_**: 
+			- Embedding position => Skip_Connection[SLN => MHSA] => Skip_Connection[SLN =>MLP] => output
+			- SLN is called **_Self-modulated LayerNorm_** (as the modulation depends on no external information). The SLN formula is describe within the paper (Equation 14)
+			- Embedding as initial input, `w` => `A` as middle inputs for norm layers
+	+ **_Discriminator_**: the pipeline architecture is similar to the standard ViT model, but with several changes:
+		- Adapt the overlapping patches at the begining (rather than the nonoverlapping ones)
+		- Replace the dot product between `Q` and `K` with Euclidean (L2) distance in the Attention formula
+		- Apply spectral normalization (read paper for more information)
++ **Code**: To be updated
+
 ## Object Detection/Segmentation Transformer
+
 ### DETR (Detection Transformer)
 + **Paper**: https://arxiv.org/pdf/2005.12872.pdf  
 ![](Images/DETR.png)  
@@ -109,7 +150,7 @@ Keep updated
 + **Downsampling (Encoder)**: using CNN-Transformer Hybrid
 	+ (Medical) Image `[H, W, C]` => _**CNN**_ => 2D feature map => _**Linear Projection**_ (Flatten into 2D Patch embedding) => Downsampling => _**Tranformer**_ => Hidden feature `[n_patch, D]`
 		- CNN: downsampling by 1/2 => 1/4 => 1/8
-		- Transformer: Norm layer *before* MHA/FFN (rather than applying Norm layer after MHA/FFN like the original Transformer), total 12 layers
+		- Transformer: Norm layer *before* MHSA/FFN (rather than applying Norm layer after MHSA/FFN like the original Transformer), total 12 layers
 	+ Why using CNN-Transformer hybrid:
 		- Leverages the intermediate high-resolution CNN feature maps in the Decoder
 		- Performs better than the purge transformer
@@ -143,7 +184,72 @@ Keep updated
 	4. **_3rd Linear layer_**: predicting segmentation mask M `[H/4, W/4, N_cls]` with `F`
 + **Code**: https://github.com/lucidrains/segformer-pytorch
 
+### Fully Transformer Networks (FTN)
++ **Paper**: https://arxiv.org/pdf/2106.04108.pdf  
+![](Images/FTN.png)  
++ Fully Transformer Networks for semantic image segmentation, without relying on CNN.
+	- Both the encoder and decoder are composed of multiple transformer modules
+	- **_Pyramid Group Transformers (PGT) encoder_** to divide feature maps into multiple spatial groups => compute the representation for each
+		- Capable to handle spatial detail or local structure like CNN
+		- Reduce unaffordable computational & memory cost of the standard ViT; reduce feature resolution and increase the receptive field for extracting hierarchical features
+	- **_Feature Pyramid Transformer (FPT) decoder_** => fuse semantic-level & spatial level information from PGT encoders => high-resolution, high-level semantic output
++ **Architecture**:
+	- Image => Patch => PGT Encoder => FPT Decoder => linear layer => bilinear upsampling => probability map => argmax(prob_map) => Segmentation
+	- **_PGT_**: four hierarchical stages that generate features with multiple scales, include Patch Transform (non-overlapping) + PGT Block to to extract hierarchical representations
+		+ PGT Block: Skip_Connection[Norm => PG-MSA] => Skip_Connection[Norm => MLP]
+		+ **_PG-MSA (Pyramid-group transformer block)_**: `Head_ij`=Attention(Qij,Kij,Vij) => `hi` = reshape(Head_ij) => PG-MSA = Concat(`hi`)
+	- **_FPT_**: aggregate the information from multiple levels of PGT encoder => generate finer semantic image segmentation
+		+ The scale of FPT is not larger the better for segmentation (with limited segmentation training data) => determined by depth, embedding dim, and the reduction ratio of SR-MSA 
+		+ **_SR-MSA (Spatial-reduction transformer block)_**: reduce memory and computation cost by spatially reducing the number of Key & Value tokiens, especially for high-resoluton representations
+		+ The multi-level high-resolution feature of each branch => fusing (element-wise summation/channel-wise concatenation) => finer prediction
++ **Code**: To be updated
+
+### SOTR (Segmenting Objects with Transformer)
++ **Paper**: https://arxiv.org/pdf/2108.06747.pdf  
+![](Images/SOTR.png)  
++ Combines the advantages of CNN and Transformer
++ **Architecture**:
+	+ **_Pipeline_**:
+		- Image => _CNN Backbone_ => feature maps in multi-scale => patch recombination + positional embedding => clip-lvel feature sequences/blocks => _Transformer_ => global-level semantic feature => functional heads => class & conv kernel prediction 
+		- Backbone output  => _Multi-level upsampling model_ (with dynamic conv) => dynamic conv(output, Kerner head) => instance masks
+	+ **_CNN Backbone_**: Feature pyramid network
+	+ **_Transformer_**: proposed 2 different transformer designs with Twin attention:
+		- _Twin attention_: simplify the attention matrix with sparse representation (as the self-attention has both quadratic time and memory complicity) => higher computational cost
+			- Calculate attention within each column (independent between columns) => calculate attention within each row (independent between rows) => connect together
+			- Twin att. has a global receptive field & covers the information along 2 dimension
+		![](Images/Twin_Att.png)  
+		- Transformer layer:
+			- _Pure twin layer_: Skip_Connection[Norm => Twin Att.] => Skip_Connection[Norm => MLP]
+			- _Hybrid twin layer_: Skip_Connection[Norm => Twin Att.] => Skip_Connection[Conv3x3 => Leaky ReLU => Conv3x3]
+			- Hybrid Twin comes with the best performance
+	+  **_Multi-level upsampling model_**: P5 feature map + Positional from transformer + P2-P4 from FPN => [Conv3x3 => Group Norm => Relu, multi stage] => upsample x2, x4, x8 (for P3-P5) => added together => point-wise conv => upsamping => final `HxW` feature map
++ **Code**: https://github.com/easton-cau/SOTR
+
+### UTNet
++ **Paper**: https://arxiv.org/pdf/2107.00781.pdf  
+![](Images/UTNet.png)
++ **Pipeline**:
+	- Apply conv layers to extract local intensity feature, while using self-attention to capture long-range associative information
+	- UTNet follows the standard design of UNet, but replace the last conv of the building block in each resolution (except the highest one) with the proposed Transformer module
+	- Rather than using the convention MHSA like the standard Transformer, UTNet develops the _Efficient MHSA_ (quite similar to the one in SegFormer):
+		- **_Efficient MHSA_**: Sub-sample `K` and `V` into low-dimensional embedding (reduce size by 8_) using Conv1x1 => bilinear interpolation 
+		![](Images/Efficient_MHSA.png)
+	- Using 2-dimensional relative position encoding by adding relative height and width information rather than the standard position encoding
++ **Code**: https://github.com/yhygao/UTNet
+
+### HandsFormer
++ **Paper**: https://arxiv.org/pdf/2104.14639.pdf  
+![](Images/HansFormer.png)  
++ **Architecute**:
+	- Image => _UNet_ => Image features (from layers of UNet decoder) + Keypoint heatmap => _bilinear interpolation & concat_ => _FFN (3-layer MLP)_ => _concat_ with keypoint heatmap (with positional encoding) => keypoint representation (likely to correspond to the 2D location of hand joints)
+		- Localizing the joints of hands in 2D is more accurate than directly regressing 3D location.
+		- The 2D keypoints are a very good starting point to predict an accurate 3D pose for both hands
+	- Keypoint representation => _Transformer encoder_ => FFN (2-layer MLP + linear projection) => _Keypoint Identity predictor_ [2 FC layer => linear projection => Softmax] => 2D pose 
+	- [Joint queries, Transform encoder output] => _Transform decoder_ => 2-layer MLP + linear projection => 3D pose
++ **Code**: To be updated
+
 ## Few-shot Transformer
+
 ### Meta-DETR: Image-Level Few-Shot Object Detection with Inter-Class Correlation Exploitation
 + **Paper**: https://arxiv.org/pdf/2103.11731.pdf  
 ![](Images/Meta-DETR.png)
@@ -155,7 +261,7 @@ Keep updated
 	- Key-compoment in Meta-DETR => aggregates query features with support classes => class-agnostic prediction
 		- Can aggregate multiple support classes simultaneously => capture inter-class correlations => reduce misclassification, enhance generalization
 	- Pipeline:
-		- Query & Support features => MHA => ROIAlign + Average pooling (on the support feature only) => Query feature map `Q` & Support prototypes `S` 
+		- Query & Support features => MHSA => ROIAlign + Average pooling (on the support feature only) => Query feature map `Q` & Support prototypes `S` 
 		- `S` = Concat(`S`, BG-Prototype); Task Encodings `T` = Concat(`T`, BG-Encoding)
 		- [`Q`, `S`, `T`] => Feature maching & Encoding matching (in parallel) => FFN => Support-Aggregated Query Features
 	- **_Feature matching_**:
@@ -190,9 +296,9 @@ Keep updated
 		- FMU: 
 			- `Yi` =  `X'i` if i=1; 
 			- `Yi` =  (Conv1x1(*Concat*(`X'i`, `Ti-1`)) + `X'i`) if i>1
-	- `Yi` => [**_MHA_** => MLP (2 Linear)] => MHA => `Ti` => `T`
-		- MHA with GELU and Norm
-		- [MHA => MLP] repeat L times with L = 3
+	- `Yi` => [**_MHSA_** => MLP (2 Linear)] => MHSA => `Ti` => `T`
+		- MHSA with GELU and Norm
+		- [MHSA => MLP] repeat L times with L = 3
 		- `T` = = *Concat*(T1, T2,...Tn) at layer L
 + **Local Enhancement Module (LEM)**:
 	- Follow the same pipeline as GEM:
@@ -216,7 +322,7 @@ Keep updated
 		- Flatten query feature as input (query only)
 		- Pixel-wise feature of query images => aggregate their global context information
 	+ **_Cross-alignment block_**:
-		- Replace MHA with **_CyC-MHA_**
+		- Replace MHSA with **_CyC-MHA_**
 		- Flatten query feature and sample of support feature as input
 		- Performs attention between query and support pixel-wise features => aggregate relevant support feature into query ones
 	+ **_Cycle-Consistent Multi-head Attention (CyC-MHA)_**:
@@ -241,8 +347,42 @@ Keep updated
 	- **_First stage_**: pre-train encoder/decoder (**PSPNet** pre-trained on ImageNet) with supervised learning => stronger representation
 		- Support/Query Image => Encoder-Decoder (**PSPNet**) => Linear clasifier with Support Mask (Support only) => Classifier (Support only) => [Classifier weight `Q`, Query feature `K`, Query feature `V`]
 	- **_Second stage_**: meta-train the Classifier Weight Transformer (CWT) only (as the encoder-decoder capapble to capture generalization of unseen class)
-		- [`Q`,`K`,`V`] => Skip_Connection[Linear => MHA => Norm] => Conv operation with `Q` => Prediction Mask
+		- [`Q`,`K`,`V`] => Skip_Connection[Linear => MHSA => Norm] => Conv operation with `Q` => Prediction Mask
 + **Code**: https://github.com/zhiheLu/CWT-for-FSS
+
+### Few-shot Transformation of Common Actions into Time and Space
++ **Paper**: https://openaccess.thecvf.com/content/CVPR2021/papers/Yang_Few-Shot_Transformation_of_Common_Actions_Into_Time_and_Space_CVPR_2021_paper.pdf  
+![](Images/Few_shot_Transformer.png)  
++ The goal is localize the spatio-temporal tubelet of an action in an _untrimmed query video_ based on the common action in the _trimment support video_
++ **Architecture**:  
+	+ **_Pipeline_**:
+		- Untrimmed query video => split into clips + few support video => _Video feature extractor_ (I3D) => spatio-temporal representation => _Common Attention block_ => aligned with previous clip feature => query clip feature 
+		- Query clip feature => _Few-shot Transformer (FST)_ => fuse the support features into the query clip feature => aggregating with input embedding
+		- Top of output embedding (from FST) => _Precition network_ => final tubelet prediction
+	+ **_Video feature extractor_**:
+		- Adapt I3D as backbone to obtain spatio-temporal representation of a single query video & few support videos
+		- Support video => feed the whole video to the backbone directly
+		- Untrimmed query video => split into multiple clips => backbone network
+		- **_Common attention block_**: built on self-attention mechanism & non-local structural => model long-term spatio-temporal information
+			- Formula: A^(I1,I2) = I1 + Linear(Norm(A(I1,I2))). With A^ is the common attention, A is the standard atteention, I1, I2 are 2 inputs
+			- Common attention aligns each query clip feature with its previous clip features => contain more motion information => benefit the common action localization
+	+ **_Few-shot Transformer (FST)_**:    
+	![](Images/Few_shot_T-ransformer_detailed.png)   
+		- _Encoder_: standard architecture with MHSA^. The input is supplied with fixed spatio-temporal positional encoding.
+			- Support branch: the support video => encoder one by one => concat => `Es` => decoder (along with `Eq`)
+			- Quary branch: enhanced query clip => encoder => `Eq` => decoder
+			- The FFN can be a Conv1x1
+		- _Decoder_: 3 input [`Es`, `Eq`, input embedding (learnt positional encoding)] => Common attention/MHSA => MHSA => FFN => Add&Norm => output embedding
+	+ **_Prediction network_**: output embedding => 3-layer FFN with ReLU => linear projection => normalized center coordinates => final action tubes for the whole untrimmed query video
++ **Code**: To be updated
+
+## Other:
+
+### Do Vision Transformer see like CNN 
++ **Paper**: https://arxiv.org/pdf/2108.08810.pdf
+
+### Unifying Global-Local Representations in Salient Object Detection with Transformer
++ **Paper**: https://arxiv.org/pdf/2108.02759.pdf
 
 ## Resource
 + Papers collection about Transformer in Computer Vision: 
