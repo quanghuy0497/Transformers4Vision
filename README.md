@@ -8,16 +8,16 @@ Keep updated
 	* [Original Transformer](#Original-Transformer)
 	* [ViT (Vision Transformer)](#ViT-Vision-Transformer)
 	* [VTN (Video Transformer Network)](#VTN-Video-Transformer-Network)
-	* [ViTGAN ()](#VitGAN)
+	* [ViTGAN (Vision Transformer GAN)](#VitGAN-Vision-Transformer-GAN)
 * [Object Detection/Segmentation Transformer](#Object-DetectionSegmentation-Transformer)
 	* [DETR (Detection Transformer)](#DETR-Detection-Transformer)
 	* [AnchorDETR](#AnchorDETR)
 	* [MaskFormer](#MaskFormer)
 	* [TransUNet](#TransUNet)
 	* [SegFormer](#SegFormer)
-	* [Fully Transformer Networks (FTN)](#Fully-Transformer-Networks-FTN)
+	* [Fully Transformer Networks](#Fully-Transformer-Networks)
 	* [SOTR (Segmenting Objects with Transformer)](#SOTR-Segmenting-Objects-with-Transformer)
-	* [UTNet](#UTNet)
+	* [UTNet (U-shape Transformer Networks)](#UTNet-U-shape-Transformer-Networks)
 	* [HandsFormer](#HandsFormer)
 * [Few-shot Transformer](#Few-shot-transformer)
 	* [Meta-DETR: Image-Level Few-Shot Object Detection with Inter-Class Correlation Exploitation](#Meta-DETR-Image-Level-Few-Shot-Object-Detection-With-Inter-Class-Correlation-Exploitation)
@@ -77,7 +77,7 @@ Keep updated
 	- **_The classification head_** can be modified to facilitate different video-based tasks, i.e. temporal action localization
 + **Code**: https://github.com/bomri/SlowFast/tree/master/projects/vtn
 
-### ViTGAN
+### ViTGAN (Vision Transformer GAN)
 + **Paper**: https://arxiv.org/pdf/2107.04589.pdf  
 ![](Images/ViTGAN.png)  
 + Both the generator and the discrimiator are designed based on the stadard ViT, but with modifications
@@ -185,7 +185,7 @@ Keep updated
 	4. **_3rd Linear layer_**: predicting segmentation mask M `[H/4, W/4, N_cls]` with `F`
 + **Code**: https://github.com/lucidrains/segformer-pytorch
 
-### Fully Transformer Networks (FTN)
+### Fully Transformer Networks
 + **Paper**: https://arxiv.org/pdf/2106.04108.pdf  
 ![](Images/FTN.png)  
 + Fully Transformer Networks for semantic image segmentation, without relying on CNN.
@@ -226,7 +226,7 @@ Keep updated
 	+  **_Multi-level upsampling model_**: P5 feature map + Positional from transformer + P2-P4 from FPN => [Conv3x3 => Group Norm => Relu, multi stage] => upsample x2, x4, x8 (for P3-P5) => added together => point-wise conv => upsamping => final `HxW` feature map
 + **Code**: https://github.com/easton-cau/SOTR
 
-### UTNet
+### UTNet (U-shape Transformer Networks)
 + **Paper**: https://arxiv.org/pdf/2107.00781.pdf  
 ![](Images/UTNet.png)
 + **Pipeline**:
