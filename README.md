@@ -8,7 +8,7 @@ Keep updated
 	* [Original Transformer](#Original-Transformer)
 	* [ViT (Vision Transformer)](#ViT-Vision-Transformer)
 	* [VTN (Video Transformer Network)](#VTN-Video-Transformer-Network)
-	* [ViTGAN](#VitGAN)
+	* [ViTGAN ()](#VitGAN)
 * [Object Detection/Segmentation Transformer](#Object-DetectionSegmentation-Transformer)
 	* [DETR (Detection Transformer)](#DETR-Detection-Transformer)
 	* [AnchorDETR](#AnchorDETR)
