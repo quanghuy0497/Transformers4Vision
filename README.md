@@ -66,7 +66,7 @@ Keep updated
 + **Good video explanation**: https://www.youtube.com/watch?v=HZ4j_U3FC94
 + **Code**: https://github.com/lucidrains/vit-pytorch
 
-### VTN (Video Transformet Network)
+### VTN (Video Transformer Network)
 + **Paper**: https://arxiv.org/pdf/2102.00719.pdf  
 ![](Images/VTN.png)  
 + Based on [Longformer](https://arxiv.org/pdf/2004.05150.pdf) (transformer-based model can process a long sequence of thousands of tokens)
