@@ -16,7 +16,7 @@ Keep updated
 	* [TransUNet](#TransUNet)
 	* [SegFormer](#SegFormer)
 	* [Fully Transformer Networks (FTN)](#Fully-Transformer-Networks-FTN)
-	* [SOTR (Segmenting Objects with Transformer)](#SORT-Sementing-Objects-with-Transformer)
+	* [SOTR (Segmenting Objects with Transformer)](#SORT-Segmenting-Objects-with-Transformer)
 	* [UTNet](#UTNet)
 	* [HandsFormer](#HandsFormer)
 * [Few-shot Transformer](#Few-shot-transformer)
