@@ -16,7 +16,7 @@ Keep updated
 	* [TransUNet](#TransUNet)
 	* [SegFormer](#SegFormer)
 	* [Fully Transformer Networks (FTN)](#Fully-Transformer-Networks-FTN)
-	* [SOTR (Segmenting Objects with Transformer)](SORT-Sementing-Objects-with-Transformer)
+	* [SOTR (Segmenting Objects with Transformer)](#SORT-Sementing-Objects-with-Transformer)
 	* [UTNet](#UTNet)
 	* [HandsFormer](#HandsFormer)
 * [Few-shot Transformer](#Few-shot-transformer)
@@ -85,8 +85,9 @@ Keep updated
 	+ **_Generator_**: Input latent `z` => _Mapping Network_ (MLP) => latent vector `w` => _Affine transform_ `A` => _Transformer Encoder_ => _Fourier Encoding_ (sinusoidal/sine activation) => `E_fou` => _2-layer MPL_ => Generated Patches
 		- **_Transformer Encoder_**: 
 			- Embedding position => Skip_Connection[SLN => MHSA] => Skip_Connection[SLN =>MLP] => output
-			- SLN is called **_Self-modulated LayerNorm_** (as the modulation depends on no external information). The SLN formula is describe within the paper (Equation 14)
-			- Embedding as initial input, `w` => `A` as middle inputs for norm layers
+			- SLN is called **_Self-modulated LayerNorm_** (as the modulation depends on no external information)
+				- The SLN formula is describe within the paper (Equation 14)
+			- Embedding `E` as initial input; `A` as middle inputs for the norm layers
 	+ **_Discriminator_**: the pipeline architecture is similar to the standard ViT model, but with several changes:
 		- Adapt the overlapping patches at the begining (rather than the nonoverlapping ones)
 		- Replace the dot product between `Q` and `K` with Euclidean (L2) distance in the Attention formula
@@ -232,7 +233,7 @@ Keep updated
 	- Apply conv layers to extract local intensity feature, while using self-attention to capture long-range associative information
 	- UTNet follows the standard design of UNet, but replace the last conv of the building block in each resolution (except the highest one) with the proposed Transformer module
 	- Rather than using the convention MHSA like the standard Transformer, UTNet develops the _Efficient MHSA_ (quite similar to the one in SegFormer):
-		- **_Efficient MHSA_**: Sub-sample `K` and `V` into low-dimensional embedding (reduce size by 8_) using Conv1x1 => bilinear interpolation 
+		- **_Efficient MHSA_**: Sub-sample `K` and `V` into low-dimensional embedding (reduce size by 8) using Conv1x1 => bilinear interpolation 
 		![](Images/Efficient_MHSA.png)
 	- Using 2-dimensional relative position encoding by adding relative height and width information rather than the standard position encoding
 + **Code**: https://github.com/yhygao/UTNet
@@ -364,11 +365,12 @@ Keep updated
 		- Support video => feed the whole video to the backbone directly
 		- Untrimmed query video => split into multiple clips => backbone network
 		- **_Common attention block_**: built on self-attention mechanism & non-local structural => model long-term spatio-temporal information
-			- Formula: A^(I1,I2) = I1 + Linear(Norm(A(I1,I2))). With A^ is the common attention, A is the standard atteention, I1, I2 are 2 inputs
+			- Formula: `A^(I1,I2) = I1 + Linear(Norm[A(I1,I2)])`
+				- With A^ is the common attention, A is the standard atteention, I1, I2 are 2 inputs
 			- Common attention aligns each query clip feature with its previous clip features => contain more motion information => benefit the common action localization
 	+ **_Few-shot Transformer (FST)_**:    
 	![](Images/Few_shot_T-ransformer_detailed.png)   
-		- _Encoder_: standard architecture with MHSA^. The input is supplied with fixed spatio-temporal positional encoding.
+		- _Encoder_: standard architecture with MHSA. The input is supplied with fixed spatio-temporal positional encoding.
 			- Support branch: the support video => encoder one by one => concat => `Es` => decoder (along with `Eq`)
 			- Quary branch: enhanced query clip => encoder => `Eq` => decoder
 			- The FFN can be a Conv1x1
