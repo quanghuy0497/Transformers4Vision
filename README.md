@@ -9,26 +9,26 @@ Keep updated
 	* [ViT (Vision Transformer)](#ViT-Vision-Transformer)
 	* [VTN (Video Transformer Network)](#VTN-Video-Transformer-Network)
 	* [ViTGAN (Vision Transformer GAN)](#VitGAN-Vision-Transformer-GAN)
+	* [Do Vision Transformer see like CNN?](#Do-Vision-Transformer-see-like-CNN)
 * [Object Detection/Segmentation Transformer](#Object-DetectionSegmentation-Transformer)
 	* [DETR (Detection Transformer)](#DETR-Detection-Transformer)
 	* [AnchorDETR](#AnchorDETR)
 	* [MaskFormer](#MaskFormer)
 	* [SegFormer](#SegFormer)
 	* [Fully Transformer Networks](#Fully-Transformer-Networks)
-	* [SOTR (Segmenting Objects with Transformer)](#SOTR-Segmenting-Objects-with-Transformer)
 	* [TransUNet](#TransUNet)
 	* [UTNet (U-shape Transformer Networks)](#UTNet-U-shape-Transformer-Networks)
+	* [SOTR (Segmenting Objects with Transformer)](#SOTR-Segmenting-Objects-with-Transformer)
 	* [HandsFormer](#HandsFormer)
+	* [Unifying Global-Local Representations in Salient Object Detection with Transformer](#Unifying-Global-Local-Representations-in-Salient-Object-Detection-with-Transformer)
 * [Few-shot Transformer](#Few-shot-transformer)
 	* [Meta-DETR: Image-Level Few-Shot Object Detection with Inter-Class Correlation Exploitation](#Meta-DETR-Image-Level-Few-Shot-Object-Detection-With-Inter-Class-Correlation-Exploitation)
 	* [Boosting Few-shot Semantic Segmentation with Transformers](#Boosting-Few-shot-Semantic-Segmentation-with-Transformers)
 	* [Few-Shot Segmentation via Cycle-Consistent Transformer](#Few-Shot-Segmentation-via-Cycle-Consistent-Transformer)
 	* [Few-shot Semantic Segmentation with Classifier Weight Transformer](#Few-shot-Semantic-Segmentation-with-Classifier-Weight-Transformer)
 	* [Few-shot Transformation of Common Actions into Time and Space](#Few-shot-Transformation-of-Common-Actions-into-Time-And-Space)
-* [Other](#Other)
-	* [Do Vision Transformer see like CNN](#Do-Vision-Transformer-see-like-CNN)
-	* [Unifying Global-Local Representations in Salient Object Detection with Transformer](#Unifying-Global-Local-Representations-in-Salient-Object-Detection-with-Transformer)
-* [Resource](#Resource)
+	* [A Universal Representation Transformer Layer for Few-Shot Image Classification](#A-Universal-Representation-Transformer-Layer-for-Few-Shot-Image-Classification)
+* [Resources](#Resources)
 
 ## Standard Transformer
 
@@ -66,7 +66,7 @@ Keep updated
 + **Good video explanation**: https://www.youtube.com/watch?v=HZ4j_U3FC94
 + **Code**: https://github.com/lucidrains/vit-pytorch
 
-### VTN (Video Transformer Network)
+### VTN (Video Transformet Network)
 + **Paper**: https://arxiv.org/pdf/2102.00719.pdf  
 ![](Images/VTN.png)  
 + Based on [Longformer](https://arxiv.org/pdf/2004.05150.pdf) (transformer-based model can process a long sequence of thousands of tokens)
@@ -93,6 +93,37 @@ Keep updated
 		- Replace the dot product between `Q` and `K` with Euclidean (L2) distance in the Attention formula
 		- Apply spectral normalization (read paper for more information)
 + **Code**: To be updated
+
+### Do Vision Transformer see like CNN?
++ **Paper**: https://arxiv.org/pdf/2108.08810.pdf  
++ **Representations Structural**:
+	- ViTs having _highly similar representations throughout the model_, while the ResNet models show much _lower similarity_ between lower and higher layers. 
+		- ViT lower layers compute representations in a different way to lower layers in the ResNet.
+		- ViT also more _strongly propagates representations_ between lower and higher layers.
+		- The highest layers of ViT have _quite different representations_ to ResNet.   
+			![](Images/ViT_CNN_1.png)  
++ **Local and Global Information in layer Representations**:
+	- ViTs have _access to more global information_ than CNNs in their lower layers, leading to _quantitatively different features_ than (computed by the local receptive fields in the lower layers of the) ResNet.
+		- Even in the **_lowest layers_** of ViT, self-attention layers have a _mix of local heads_ (small distances) _and global heads_ (large distances) => in contrast to CNNs, which is hardcoded to attend _only locally_ in the lower layers. 
+		- At **_higher layers_**, all self-attention heads are _global_.
+	- _Lower layer effective receptive fields_ for ViT are larger than in ResNets, and while ResNet effective receptive fields grow gradually, ViT receptive fields become much _more global midway through the network_.
+		 ![](Images/ViT_CNN_2.png)
++ **Representation Propagation through Skip connections**:
+	- **_Skip connections_** in ViT are even _more influential_ than in ResNet => strong effects on performance and representation similarity
+		- Skip connections play a key role in the _representational structure_ of ViT.  
+		- Skip connections play an key roles of _propagating the representations throught out the ViT_ => uniform structure in the lower and higher layers.  
+			![](Images/ViT_CNN_3.png)  
++ **Spatial Information and Localization**:
+	- _Higher layers of ViT maintain spatial location information more faithfully_ than ResNets.  
+		- ViTs with **_CLS tokens_** show _strong preservation of spatial information_ — promising for future uses in object detection.  
+			![](Images/ViT_CNN_4.png)  
+		- When trained with global average pooling (GAP) instead of a CLS token, ViTs show _less clear localization_. 
+		- ResNet50 and ViT with GAP model tokens _perform well at higher layers_, while in the standard ViT trained with a CLS token the spatial tokens do poorly – likely because their representations remain spatially localized at higher layers, which makes global classification challenging.  
+			![](Images/ViT_CNN_4.png)  
++ **Effects of Scale on Transfer Learning**:
+	- For larger models, the **_larger dataset_** is especially helpful in _learning high-quality intermediate representations_.
+	- While lower layer representations have _high similarity_ even with 10% of the data, higher layers and larger models _require significantly more data_ to learn similar representations.
+	- Larger ViT models develop _significantly stronger intermediate_ representations through _larger pre-training datasets_ than the ResNets.
 
 ## Object Detection/Segmentation Transformer
 
@@ -188,27 +219,6 @@ Keep updated
 		+ The multi-level high-resolution feature of each branch => fusing (element-wise summation/channel-wise concatenation) => finer prediction
 + **Code**: To be updated
 
-### SOTR (Segmenting Objects with Transformer)
-+ **Paper**: https://arxiv.org/pdf/2108.06747.pdf  
-![](Images/SOTR.png)  
-+ Combines the advantages of CNN and Transformer
-+ **Architecture**:
-	+ **_Pipeline_**:
-		- Image => _CNN Backbone_ => feature maps in multi-scale => patch recombination + positional embedding => clip-lvel feature sequences/blocks => _Transformer_ => global-level semantic feature => functional heads => class & conv kernel prediction 
-		- Backbone output  => _Multi-level upsampling model_ (with dynamic conv) => dynamic conv(output, Kerner head) => instance masks
-	+ **_CNN Backbone_**: Feature pyramid network
-	+ **_Transformer_**: proposed 2 different transformer designs with Twin attention:
-		- _Twin attention_: simplify the attention matrix with sparse representation (as the self-attention has both quadratic time and memory complicity) => higher computational cost
-			- Calculate attention within each column (independent between columns) => calculate attention within each row (independent between rows) => connect together
-			- Twin att. has a global receptive field & covers the information along 2 dimension
-		![](Images/Twin_Att.png)  
-		- Transformer layer:
-			- _Pure twin layer_: Skip_Connection[Norm => Twin Att.] => Skip_Connection[Norm => MLP]
-			- _Hybrid twin layer_: Skip_Connection[Norm => Twin Att.] => Skip_Connection[Conv3x3 => Leaky ReLU => Conv3x3]
-			- Hybrid Twin comes with the best performance
-	+  **_Multi-level upsampling model_**: P5 feature map + Positional from transformer + P2-P4 from FPN => [Conv3x3 => Group Norm => Relu, multi stage] => upsample x2, x4, x8 (for P3-P5) => added together => point-wise conv => upsamping => final `HxW` feature map
-+ **Code**: https://github.com/easton-cau/SOTR
-
 ### TransUNet
 + **Paper**: https://arxiv.org/pdf/2102.04306.pdf  
 ![](Images/TransUNet.png)  
@@ -238,6 +248,27 @@ Keep updated
 	- Using 2-dimensional relative position encoding by adding relative height and width information rather than the standard position encoding
 + **Code**: https://github.com/yhygao/UTNet
 
+### SOTR (Segmenting Objects with Transformer)
++ **Paper**: https://arxiv.org/pdf/2108.06747.pdf  
+![](Images/SOTR.png)  
++ Combines the advantages of CNN and Transformer
++ **Architecture**:
+	+ **_Pipeline_**:
+		- Image => _CNN Backbone_ => feature maps in multi-scale => patch recombination + positional embedding => clip-lvel feature sequences/blocks => _Transformer_ => global-level semantic feature => functional heads => class & conv kernel prediction 
+		- Backbone output  => _Multi-level upsampling model_ (with dynamic conv) => dynamic conv(output, Kerner head) => instance masks
+	+ **_CNN Backbone_**: Feature pyramid network
+	+ **_Transformer_**: proposed 2 different transformer designs with Twin attention:
+		- _Twin attention_: simplify the attention matrix with sparse representation (as the self-attention has both quadratic time and memory complicity) => higher computational cost
+			- Calculate attention within each column (independent between columns) => calculate attention within each row (independent between rows) => connect together
+			- Twin att. has a global receptive field & covers the information along 2 dimension
+		![](Images/Twin_Att.png)  
+		- Transformer layer:
+			- _Pure twin layer_: Skip_Connection[Norm => Twin Att.] => Skip_Connection[Norm => MLP]
+			- _Hybrid twin layer_: Skip_Connection[Norm => Twin Att.] => Skip_Connection[Conv3x3 => Leaky ReLU => Conv3x3]
+			- Hybrid Twin comes with the best performance
+	+  **_Multi-level upsampling model_**: P5 feature map + Positional from transformer + P2-P4 from FPN => [Conv3x3 => Group Norm => Relu, multi stage] => upsample x2, x4, x8 (for P3-P5) => added together => point-wise conv => upsamping => final `HxW` feature map
++ **Code**: https://github.com/easton-cau/SOTR
+
 ### HandsFormer
 + **Paper**: https://arxiv.org/pdf/2104.14639.pdf  
 ![](Images/HansFormer.png)  
@@ -248,6 +279,25 @@ Keep updated
 	- Keypoint representation => _Transformer encoder_ => FFN (2-layer MLP + linear projection) => _Keypoint Identity predictor_ [2 FC layer => linear projection => Softmax] => 2D pose 
 	- [Joint queries, Transform encoder output] => _Transform decoder_ => 2-layer MLP + linear projection => 3D pose
 + **Code**: To be updated
+
+### Unifying Global-Local Representations in Salient Object Detection with Transformer
++ **Paper**: https://arxiv.org/pdf/2108.02759.pdf  
+![](Images/GLSTR.png)
++ Jointly learn global and local features in a layer-wise manner => solving the salient object detection task with the help of Transformer
+	- With the self-attention mechanism => transformer is capable to model the "contrast" => demonstrated to be crucial for saliency perception
++ **Architecture**:  
+	+ **_Encoder_**:
+		- Input => split to grid of fixed-size patches => _linear projection_ => feature vector (represent local details) + positional encoding => _Encoder_ => encode global features without diluting the local ones
+		- The Encoder includes 17 layers of standard transformer encoder.
+	+ **_Decoder_**:  
+		![](Images/GLSTR_decoder.png)  
+		- Decode the features with global-local information over the inputs and the previous layer from encoder by densely decode => preserve rich local & global features.
+	 	- The density decoder contains various types of decoder blocks, including:
+		 	- **_Naive Decoder_**: directly upsampling the outputs of last layer => same resolution of inputs => generating the saliency map. Specifically, 3 Conv-norm-ReLU are aplied => bilinearly upsample x16 => sigmoid
+		 	- **_Stage-by-Stage Decoder_**: upsamples the resolution x2 in each stage => miltigate the losses of spatial details. Specifically, 4 stage x [3 Conv-norm-ReLU => sigmoid]
+		 	- **_Multi-level Feature Decoder_**: sparsely fuse multi-level features, similar to the pyramid network. Specifically take feature F3, F6, F9, F12 (from the corresponed layers of encoder) => upsample x4 => several conv layers => fused => saliency maps
+		- **_Density Decoder_**: integrate all encoder layer features => upsample to the same spatial resolution of input (include pixel suffle & bilinear upsampling x2) => concat => salient feature => Conv => sigmoid => saliency map
++ **Code**: https://github.com/OliverRensu/GLSTR
 
 ## Few-shot Transformer
 
@@ -366,7 +416,7 @@ Keep updated
 		- Untrimmed query video => split into multiple clips => backbone network
 		- **_Common attention block_**: built on self-attention mechanism & non-local structural => model long-term spatio-temporal information
 			- Formula: `A^(I1,I2) = I1 + Linear(Norm[A(I1,I2)])`
-				- With A^ is the common attention, A is the standard atteention, I1, I2 are 2 inputs
+				- With `A^` is the common attention, A is the standard attention, I1, I2 are 2 inputs
 			- Common attention aligns each query clip feature with its previous clip features => contain more motion information => benefit the common action localization
 	+ **_Few-shot Transformer (FST)_**:    
 	![](Images/Few_Shot_Transformer_detailed.png)   
@@ -378,20 +428,28 @@ Keep updated
 	+ **_Prediction network_**: output embedding => 3-layer FFN with ReLU => linear projection => normalized center coordinates => final action tubes for the whole untrimmed query video
 + **Code**: To be updated
 
-## Other:
+### A Universal Representation Transformer Layer for Few-Shot Image Classification
++ **Paper**: https://arxiv.org/pdf/2006.11702.pdf  
+![](Images/URT.png)  
++ URT layer is inspired from the standard Transformer network to effectively **_integrate the feature representations_** from the _diverse set_ of training domains
+	- Uses an attention mechanism to learn to retrieve or blend the appropriate backbones to use for each task
+	- Training URT layer across few-shot tasks from many domains => support transfer across these tasks
++ **Architecture**:
+	- `ri(x)` is the output vector from the backbone for domain `i` => `r(x)` = concat[r1(x),...rm(x)] on `m` pre-trained backbones
+	- representation of Support set class `r(Sc) = sum[r(x)]/|Sc|`
+	- For each class `c`, query `Qc` = Linear(`r(Sc)`) with weight `Wc`, bias `bc`; For each domain `i` and class `c`, key `Kic` = Linear(`ri(Sc)`) with `Wk, bk`
+	- Then, with `Qc`, `Kic`, the scale dot-product attention `Aic` is calculated as usual
+	- The adapted representation for the support & query set examples is compute by `O(x) = Sum(Ai*ri(x)`
+	- Finally, the multi-head URT `O(X)` is the concatenation of all `O(x)`, just like usual.
++ **Code**: https://github.com/liulu112601/URT
 
-### Do Vision Transformer see like CNN 
-+ **Paper**: https://arxiv.org/pdf/2108.08810.pdf
-
-### Unifying Global-Local Representations in Salient Object Detection with Transformer
-+ **Paper**: https://arxiv.org/pdf/2108.02759.pdf
-
-## Resource
-+ Papers collection about Transformer in Computer Vision: 
+## Resources
++ Paper collections about Transformer in Computer Vision: 
 	- https://github.com/dk-liang/Awesome-Visual-Transformer
 	- https://github.com/DirtyHarryLYL/Transformer-in-Vision
 	- https://github.com/Yangzhangcst/Transformer-in-Computer-Vision
-
++ There are plenty of ViT-based models and versions in this repository, in Pytorch:
+	- https://github.com/lucidrains/vit-pytorch
 
 
 
