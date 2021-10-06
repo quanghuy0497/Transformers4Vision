@@ -6,10 +6,10 @@ Keep updated
 ## Table of contents
 * [Standard Transformer](#Standard-Transformer)
 	* [Original Transformer](#Original-Transformer)
+	* [Do Vision Transformer see like CNN?](#Do-Vision-Transformer-see-like-CNN)
 	* [ViT (Vision Transformer)](#ViT-Vision-Transformer)
 	* [VTN (Video Transformer Network)](#VTN-Video-Transformer-Network)
 	* [ViTGAN (Vision Transformer GAN)](#VitGAN-Vision-Transformer-GAN)
-	* [Do Vision Transformer see like CNN?](#Do-Vision-Transformer-see-like-CNN)
 * [Object Detection/Segmentation Transformer](#Object-DetectionSegmentation-Transformer)
 	* [DETR (Detection Transformer)](#DETR-Detection-Transformer)
 	* [AnchorDETR](#AnchorDETR)
@@ -40,7 +40,8 @@ Keep updated
 	- Positional Encoding => encode the _positions of embedding word within the sentence_ in the input of Encoder/Decoder block
 + **Encoder**:
 	- Embedding words => Skip_Connection[**_MHSA_** => Norm] => Skip_Connection[**_FFN_** => Norm] => Encoder output
-		- **_MHSA_**: Multi-Head Self Attention
+		- **_MHSA_**: Multi-Head Self Attention  
+			![](Images/MHSA.png)  
 		- **_FFN_**: FeedForward Neural Network
 	+ Repeat N times (N usually 6)
 + **Decoder**:
@@ -49,9 +50,42 @@ Keep updated
 		- Encoder input (put in the middle of the Decoder)
 	- (Input + Positional Encoding) => Skip_Connection[**_MHSA_** + Norm] => Skip_Connection[(+Encoder input) => **_MHSA_** => Norm] => Skip_Connection[**_FFN_** + Norm] => Linear => Softmax => Decoder Output
 	- Using the decoder output as the input for next round, repeat N times (N ussually 6)
-+ [Read here](https://github.com/quanghuy0497/Deep-Learning-Specialization/tree/main/Course%205%20-%20Sequence%20Models#transformer-network-1) for more detail
-	+ Also [here](https://phamdinhkhanh.github.io/2019/06/18/AttentionLayer.html) if you prefer  detailed explanation in Vienamese
++ [Read here](https://github.com/quanghuy0497/Deep-Learning-Specialization/tree/main/Course%205%20-%20Sequence%20Models#transformer-network-1) to learn in detail about the MHSA and Transformer architectures
+	+ Also [here](https://phamdinhkhanh.github.io/2019/06/18/AttentionLayer.html) if you prefer detailed explanation in Vienamese
+	+ Computational complexity between Self-Attention; Conv and RNN:  
+		![](Images/complexity.png)  
 + **Codes**: https://github.com/SamLynnEvans/Transformer
+
+### Do Vision Transformer see like CNN?
++ **Paper**: https://arxiv.org/pdf/2108.08810.pdf  
++ **Representations Structural**:
+	- ViTs having _highly similar representations throughout the model_, while the ResNet models show much _lower similarity_ between lower and higher layers. 
+		- ViT lower layers compute representations in a different way to lower layers in the ResNet.
+		- ViT also more _strongly propagates representations_ between lower and higher layers.
+		- The highest layers of ViT have _quite different representations_ to ResNet.   
+			![](Images/ViT_CNN_1.png)  
++ **Local and Global Information in layer Representations**:
+	- ViTs have _access to more global information_ than CNNs in their lower layers, leading to _quantitatively different features_ than (computed by the local receptive fields in the lower layers of the) ResNet.
+		- Even in the **_lowest layers_** of ViT, self-attention layers have a _mix of local heads_ (small distances) _and global heads_ (large distances) => in contrast to CNNs, which is hardcoded to attend _only locally_ in the lower layers. 
+		- At **_higher layers_**, all self-attention heads are _global_.
+	- _Lower layer effective receptive fields_ for ViT are larger than in ResNets, and while ResNet effective receptive fields grow gradually, ViT receptive fields become much _more global midway through the network_.
+		 ![](Images/ViT_CNN_2.png)
++ **Representation Propagation through Skip connections**:
+	- **_Skip connections_** in ViT are even _more influential_ than in ResNet => strong effects on performance and representation similarity
+		- Skip connections play a key role in the _representational structure_ of ViT.  
+		- Skip connections play an key roles of _propagating the representations throught out the ViT_ => uniform structure in the lower and higher layers.  
+			![](Images/ViT_CNN_3.png)  
++ **Spatial Information and Localization**:
+	- _Higher layers of ViT maintain spatial location information more faithfully_ than ResNets.  
+		- ViTs with **_CLS tokens_** show _strong preservation of spatial information_ — promising for future uses in object detection.  
+			![](Images/ViT_CNN_4.png)  
+		- When trained with global average pooling (GAP) instead of a CLS token, ViTs show _less clear localization_. 
+		- ResNet50 and ViT with GAP model tokens _perform well at higher layers_, while in the standard ViT trained with a CLS token the spatial tokens do poorly – likely because their representations remain spatially localized at higher layers, which makes global classification challenging.  
+			![](Images/ViT_CNN_4.png)  
++ **Effects of Scale on Transfer Learning**:
+	- For larger models, the **_larger dataset_** is especially helpful in _learning high-quality intermediate representations_.
+	- While lower layer representations have _high similarity_ even with 10% of the data, higher layers and larger models _require significantly more data_ to learn similar representations.
+	- Larger ViT models develop _significantly stronger intermediate_ representations through _larger pre-training datasets_ than the ResNets.
 
 ### ViT (Vision Transformer)
 + **Paper**: https://arxiv.org/pdf/2010.11929.pdf
@@ -93,37 +127,6 @@ Keep updated
 		- Replace the dot product between `Q` and `K` with Euclidean (L2) distance in the Attention formula
 		- Apply spectral normalization (read paper for more information)
 + **Code**: To be updated
-
-### Do Vision Transformer see like CNN?
-+ **Paper**: https://arxiv.org/pdf/2108.08810.pdf  
-+ **Representations Structural**:
-	- ViTs having _highly similar representations throughout the model_, while the ResNet models show much _lower similarity_ between lower and higher layers. 
-		- ViT lower layers compute representations in a different way to lower layers in the ResNet.
-		- ViT also more _strongly propagates representations_ between lower and higher layers.
-		- The highest layers of ViT have _quite different representations_ to ResNet.   
-			![](Images/ViT_CNN_1.png)  
-+ **Local and Global Information in layer Representations**:
-	- ViTs have _access to more global information_ than CNNs in their lower layers, leading to _quantitatively different features_ than (computed by the local receptive fields in the lower layers of the) ResNet.
-		- Even in the **_lowest layers_** of ViT, self-attention layers have a _mix of local heads_ (small distances) _and global heads_ (large distances) => in contrast to CNNs, which is hardcoded to attend _only locally_ in the lower layers. 
-		- At **_higher layers_**, all self-attention heads are _global_.
-	- _Lower layer effective receptive fields_ for ViT are larger than in ResNets, and while ResNet effective receptive fields grow gradually, ViT receptive fields become much _more global midway through the network_.
-		 ![](Images/ViT_CNN_2.png)
-+ **Representation Propagation through Skip connections**:
-	- **_Skip connections_** in ViT are even _more influential_ than in ResNet => strong effects on performance and representation similarity
-		- Skip connections play a key role in the _representational structure_ of ViT.  
-		- Skip connections play an key roles of _propagating the representations throught out the ViT_ => uniform structure in the lower and higher layers.  
-			![](Images/ViT_CNN_3.png)  
-+ **Spatial Information and Localization**:
-	- _Higher layers of ViT maintain spatial location information more faithfully_ than ResNets.  
-		- ViTs with **_CLS tokens_** show _strong preservation of spatial information_ — promising for future uses in object detection.  
-			![](Images/ViT_CNN_4.png)  
-		- When trained with global average pooling (GAP) instead of a CLS token, ViTs show _less clear localization_. 
-		- ResNet50 and ViT with GAP model tokens _perform well at higher layers_, while in the standard ViT trained with a CLS token the spatial tokens do poorly – likely because their representations remain spatially localized at higher layers, which makes global classification challenging.  
-			![](Images/ViT_CNN_4.png)  
-+ **Effects of Scale on Transfer Learning**:
-	- For larger models, the **_larger dataset_** is especially helpful in _learning high-quality intermediate representations_.
-	- While lower layer representations have _high similarity_ even with 10% of the data, higher layers and larger models _require significantly more data_ to learn similar representations.
-	- Larger ViT models develop _significantly stronger intermediate_ representations through _larger pre-training datasets_ than the ResNets.
 
 ## Object Detection/Segmentation Transformer
 
