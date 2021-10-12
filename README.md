@@ -192,18 +192,18 @@ This section introduces techniques of training vision transformer-based model ef
 + **Paper**:  https://arxiv.org/pdf/1812.01243v9.pdf  
 ![](Images/Efficient_Attention.png)  
 + **Efficient Attention**:
-	- Linear memory and computational complexity O(d^2.n)
+	- Linear memory and computational complexity O(k.d.n)
 	- Possess the same representational power as the convention dot-product attention
 	- Actually, it comes with better performance than the convention attention
 + **Method**:
-	- Initially, feature X => 3 linears => `Q`: [n, k]; `K`: [n, k]; `V`: [n, c] with k and c are the dimensionalities of keys and inputs.
+	- Initially, feature X => 3 linears => `Q`: [n, k]; `K`: [n, k]; `V`: [n, d] with k and d are the dimensionalities of keys and input representation (or embedding).
 	- The **_Dot-product Attetion_** is calculated by: `D(Q,K,V) = p(Q.K^T).V`. => scale with `sqrt(k)` => sigmoid
 		- p is the normalization
-		- The `Q.K^T` (denoted _Pairwise similarity_ `S`) have the shape [n, n] => `S.V` have the shape [n, c] => **O(n^2)**
+		- The `Q.K^T` (denoted _Pairwise similarity_ `S`) have the shape [n, n] => `S.V` have the shape [n, d] => **O(n^2.d)**
 	- The **_Efficient Attention_** is calculated by: `E(Q,K,V) = p(Q.(K^T.V))` => scales with `sqrt(n)` => sigmoid
 		- p is the normalization
-		- The `K^T.V` (denoted _Global Context Vectors_ `G`) have the shape [k, c] with `k` & `c` are constants => O(1)
-		- Then, `Q.G` have the shape [n, c] => **O(n)** 
+		- The `K^T.V` (denoted _Global Context Vectors_ `G`) have the shape [k, d] with `k` & `d` are constants => O(1)
+		- Then, `Q.G` have the shape [n, d] => **O(n)** 
 + Then, the _Dot-product Attetion_ and the _Efficient Attention_ are equivalence with each other with mathematic proof:
 	![](Images/Dot_Efficient_comparison)
 + Explanation from the author: https://cmsflash.github.io/ai/2019/12/02/efficient-attention.html
