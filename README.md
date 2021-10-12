@@ -1,16 +1,28 @@
 ## About
-Summary Transformer-based architectures for Computer Vision. Focusing on object detection, segmentation, and few-shot segmentation.
+This repository summaries Transformer-based architectures in the Computer Vision aspect, from the very basic (classification) to complex (object detection, segmentation, few-shot learning) tasks.
 
-Keep updated
+The main purpose of this list is to review and recap only the main approach/pipeline/architecture of these papers to capture the overview of **transformers for vision**, so other parts of the papers e.g. experimental performance, comparison results won't be presented. For a better intuition, please read the original article and code that are attached along with the recap sections. Of course, there might be some mistakes when reviewing these papers, so if there is something wrong or inaccurate, please feel free to tell me.
+
+The paper summarizations list will be updated regularly.
 
 ## Table of contents
-* [Standard Transformer](#Standard-Transformer)
+* [**Standard Transformer**](#Standard-Transformer)
 	* [Original Transformer](#Original-Transformer)
 	* [ViT (Vision Transformer)](#ViT-Vision-Transformer)
 	* [VTN (Video Transformer Network)](#VTN-Video-Transformer-Network)
 	* [ViTGAN (Vision Transformer GAN)](#VitGAN-Vision-Transformer-GAN)
+	* [Conv Block Attention Module](#Conv-Block-Attention-Module)
 	* [Do Vision Transformer see like CNN?](#Do-Vision-Transformer-see-like-CNN)
-* [Object Detection/Segmentation Transformer](#Object-DetectionSegmentation-Transformer)
+* [**Optimization Transformer**](#Optimization-Transformer)
+	* [How to train ViT?](#How-to-train-ViT)
+	* [Efficient Attention](#Efficient-Attention)
+	* [Linformer](#Linformer)
+	* [Longformer](#Longformer)
+	* [Personal thoughts](#Personal-thoughts)
+* [**Classification Transformer**](#Classification-Transformer)
+	* [Instance-level Image Retrieval using Reranking Transformers](#Instance-Level-Image-Retrieval-using-Reranking-Transformers)
+	* [General Multi-label Image Classification with Transformers](#General-Multi-Label-Image-Classification-with-Transformers)
+* [**Object Detection/Segmentation Transformer**](#Object-DetectionSegmentation-Transformer)
 	* [DETR (Detection Transformer)](#DETR-Detection-Transformer)
 	* [AnchorDETR](#AnchorDETR)
 	* [MaskFormer](#MaskFormer)
@@ -21,10 +33,7 @@ Keep updated
 	* [SOTR (Segmenting Objects with Transformer)](#SOTR-Segmenting-Objects-with-Transformer)
 	* [HandsFormer](#HandsFormer)
 	* [Unifying Global-Local Representations in Salient Object Detection with Transformer](#Unifying-Global-Local-Representations-in-Salient-Object-Detection-with-Transformer)
-* [Image Classification Transformer](#Image-Classification-Transformer)
-	* [Instance-level Image Retrieval using Reranking Transformers](#Instance-Level-Image-Retrieval-using-Reranking-Transformers)
-	* [General Multi-label Image Classification with Transformers](#General-Multi-Label-Image-Classification-with-Transformers)
-* [Few-shot Transformer](#Few-shot-transformer)
+* [**Few-shot Transformer**](#Few-shot-transformer)
 	* [Meta-DETR: Image-Level Few-Shot Object Detection with Inter-Class Correlation Exploitation](#Meta-DETR-Image-Level-Few-Shot-Object-Detection-With-Inter-Class-Correlation-Exploitation)
 	* [Boosting Few-shot Semantic Segmentation with Transformers](#Boosting-Few-shot-Semantic-Segmentation-with-Transformers)
 	* [Few-Shot Segmentation via Cycle-Consistent Transformer](#Few-Shot-Segmentation-via-Cycle-Consistent-Transformer)
@@ -33,14 +42,16 @@ Keep updated
 	* [A Universal Representation Transformer Layer for Few-Shot Image Classification](#A-Universal-Representation-Transformer-Layer-for-Few-Shot-Image-Classification)
 * [Resources](#Resources)
 
-## Standard Transformer
+## **Standard Transformer**
+This section introduces original transformer architecture in NLP as well as its versions in Computer Vision, including ViT for image classification, VTN for video classification, and ViTGAN for the generative adversarial network. Finally, a deep comparision between ViT and ResNet is introduced, to see deep down if the anttention-based model is similar to the Conv-based model.
 
 ### Original Transformer
 + **Paper**: https://arxiv.org/abs/1706.03762
 ![](Images/Transformer.png)  
 + **Input**: 
 	- Sequence embedding (e.g. word embeddings of a sentence)
-	- Positional Encoding => encode the _positions of embedding word within the sentence_ in the input of Encoder/Decoder block
+	- **Positional Encoding (PE)** => encode the _positions of embedding word within the sentence_ in the input of Encoder/Decoder block
+		- [_Detailed explanation_](https://kazemnejad.com/blog/transformer_architecture_positional_encoding/) of PE 
 + **Encoder**:
 	- Embedding words => Skip_Connection[**_MHSA_** => Norm] => Skip_Connection[**_FFN_** => Norm] => Encoder output
 		- **_MHSA_**: Multi-Head Self Attention  
@@ -75,7 +86,7 @@ Keep updated
 ### VTN (Video Transformet Network)
 + **Paper**: https://arxiv.org/pdf/2102.00719.pdf  
 ![](Images/VTN.png)  
-+ Based on [Longformer](https://arxiv.org/pdf/2004.05150.pdf) (transformer-based model can process a long sequence of thousands of tokens)
++ Based on Longformer - transformer-based model can process a long sequence of thousands of tokens
 + **Pipeline**: Quite similar to the standard ViT
 	- **_The 2D spatial backbone_** `f(x)` can be replaced with any given backbone for 2D images => feature extraction
 	- **_The temporal attention-based encoder_** can stack up more layers, more heads, or can be set to a different Transformers model that can process long sequences. 
@@ -99,6 +110,20 @@ Keep updated
 		- Replace the dot product between `Q` and `K` with Euclidean (L2) distance in the Attention formula
 		- Apply spectral normalization (read paper for more information)
 + **Code**: To be updated
+
+### Conv Block Attention Module
++ **Paper**: https://arxiv.org/pdf/1807.06521v2.pdf  
+![](Images/CBAM_1.png)  
++ Conv Block Attention Module (CBAM): A light weight and general attention-based module which can be used for FFN
++ **Architecture**:
+	- Intermediate feature map => infer 1D channel attetion map and 2D spatial map => multiplied to the input feature map => adaptive feature refinement  
+	![](Images/CBAM_2.png)  
+	- **_Channel attention module_**: exploiting the inter-channel relationship of features
+		- Feature map F => AvgPool || MaxPool => Share MLP [3 layers, ReLU] => element-wise summation => sigmoid => Channel attention Mc
+	- **_Spatial attention module_**: utilizing the inter-spatial relationship of feature
+		- Channel-refine feature F' => [AvgPool, MaxPool] => Conv7x7 => sigmoid => Spatial attention Ms
++ CBAM can be combine with ResBlock:
+	- Conv => Skip_connection(CBAM) => Next Conv
 
 ### Do Vision Transformer see like CNN?
 + **Paper**: https://arxiv.org/pdf/2108.08810.pdf  
@@ -131,7 +156,154 @@ Keep updated
 	- While lower layer representations have _high similarity_ even with 10% of the data, higher layers and larger models _require significantly more data_ to learn similar representations.
 	- Larger ViT models develop _significantly stronger intermediate_ representations through _larger pre-training datasets_ than the ResNets.
 
-## Object Detection/Segmentation Transformer
+## **Optimization Transformer** 
+This section introduces techniques of training vision transformer-based model effectively with optimization methods (data, augmentation, regularization,...). As the Scaled Dot-Product Attention comes with quadratic complexity **O(N^2)**, several approaches (Efficient Attention, Linformer) are introduced to reduce the computational complexity down to linear **O(N)**. Finally, I have some hypotheses (which aren't certainly proved) for the complexity optimization of matmul technique.
+
+### How to train ViT?
++ **Paper**: https://arxiv.org/pdf/2106.10270.pdf  
++ **Experimental hyperparameters**:
+	+ Pre-trained
+		- Adam optimization with b1 = 0.9 and b2 = 0.999
+		- Batch size 4096
+		- Cosine learning rate with linear warmup 10k step
+		- Gradient clipping at global norm 1
+	+ Fine-tune:
+		- SGD optimization with momentum 0.9
+		- Batch size of 512
+		- Cosine decay learning rate schedule with a linear warmup
+		- Gradient clipping at global norm 1
++ **Regularization & augmentation**:
+	- By the judicious (wise) amount of regularization and image augmentation, one can (pre-)train a model to **_similar accuracy_** by increasing the dataset size by about an order of magnitude.
+	- **_Deterioration_** in validation accuracy **_increase_** when using various amounts of augmentation (RandAugment, Mixup) and regularization (Dropout, StochasticDepth).
+		- Generally speaking, there are significantly more cases where adding augmentation helps, than where adding regularization helps
+		- For a relatively small amount of data, almost everything helps. But in large scale of data, almost everything hurt; only when also increasing computer, does augmentation help again
++ **Transfer**:
+	- No matter how much training time is spent, it does not seem possible to train ViT models from scratch to reach accuracy anywhere near that of the transferred model. => transfer is the **_better option_**
+	- Furthermore, since pre-trained models are feely to download, the pre-training cost for practitioners is effectively zero
+	- Adapting only the best pre-trained model **_works equally_** to adapting all pre-trained models (and then selecting the best) 
+		- Then selecting a single pre-trained model based on the upstream score is a cost-effective practical strategy
++ **Data**:
+	- More data yields **_more generic models_** => recommend that the design choice is using more data with a fixed compute budget
++ **Patch-size**:
+	- Increasing patch size to shrinking model size
+	- Using a larger patch-size (/32) significantly outperforms making the model thinner (/16)
+
+### Efficient Attention
++ **Paper**:  https://arxiv.org/pdf/1812.01243v9.pdf  
+![](Images/Efficient_Attention.png)  
++ **Efficient Attention**:
+	- Linear memory and computational complexity O(d^2.n)
+	- Possess the same representational power as the convention dot-product attention
+	- Actually, it comes with better performance than the convention attention
++ **Method**:
+	- Initially, feature X => 3 linears => `Q`: [n, k]; `K`: [n, k]; `V`: [n, c] with k and c are the dimensionalities of keys and inputs.
+	- The **_Dot-product Attetion_** is calculated by: `D(Q,K,V) = p(Q.K^T).V`. => scale with `sqrt(k)` => sigmoid
+		- p is the normalization
+		- The `Q.K^T` (denoted _Pairwise similarity_ `S`) have the shape [n, n] => `S.V` have the shape [n, c] => **O(n^2)**
+	- The **_Efficient Attention_** is calculated by: `E(Q,K,V) = p(Q.(K^T.V))` => scales with `sqrt(n)` => sigmoid
+		- p is the normalization
+		- The `K^T.V` (denoted _Global Context Vectors_ `G`) have the shape [k, c] with `k` & `c` are constants => O(1)
+		- Then, `Q.G` have the shape [n, c] => **O(n)** 
++ Then, the _Dot-product Attetion_ and the _Efficient Attention_ are equivalence with each other with mathematic proof:
+	![](Images/Dot_Efficient_comparison)
++ Explanation from the author: https://cmsflash.github.io/ai/2019/12/02/efficient-attention.html
++ **Code**:
+	- https://github.com/cmsflash/efficient-attention
+	- https://github.com/lucidrains/linear-attention-transformer
+
+### Linformer
++ **Paper**: https://arxiv.org/pdf/2006.04768.pdf  
+![](Images/Linformer.png)  
++ The convention Scaled Dot-Product Attention is decomposed into multiple smaller attentions through linear projections, such that the combination of these operations forms a low-rank factorization of the original attention. Reduce the complexity to O(n) in time and space
++ **Method**:
+	- Add two linear projection matrices `Ei` and `Fi` [n, k] when computing `K` & `V`
+		- From `K`, `V` with shape [n, d] => `Ei.K`, `Fi.V` with shape [k, d]
+	- Then, calculate the Scaled Dot-Product Attention as usual. The operation only requires **O(nk)** time and space complexity.
+		- If the projected dimension `k` is very small in comparison with `n`, then _O(n)_
++ **Code**: 
+	- https://github.com/tatp22/linformer-pytorch
+	- https://github.com/lucidrains/linformer
+
+### Longformer
++ **Paper**: https://arxiv.org/pdf/2004.05150.pdf  
+![](Images/Longformer.png)  
++ Longformer is developed for long document in NLP, but it can also be applied for video processing
++ **Method**:
+	- **_Sliding Window_**: 
+		- With an arbitrary window size `w`, each token in the sequence will only attend to some `w` tokens (mostly `w/2` on each side) => the computation complexity is _O(n x w)_
+		- With `l` layers of the transformer, the receptive field of the sliding window attention is [l x w]
+	- **_Dilated Sliding Window_**:
+		- To further increase the receptive field without increasing computation, the sliding window can be “dilated”, similar to the dilated CNNs
+		- With the number of gaps between each token in the window `d`, the dilated attention has the dilation size of `d`.
+		- Then, the receptive field of dilated sliding window attention is [l x d x w]
+	- **_Global Attention_** (full self-attention):
+		- The windowed and dilated attention are not flexible enough to learn task-specific representation 
+		- The global attention is added to few pre-selected input locations to tackle the problem.
+	- **_Linear Projection for Global Attention_**:
+		- 2 separate sets [Qs, Ks, Vs] and [Qg, Kg, Vg] was used for sliding window and global attention, respectively
+		- This provides flexibility to model the different types of attention patterns
++ **Code**: https://github.com/allenai/longformer
+
+### Personal thoughts
++ I wonder if we apply the **row/column multiplication** methods (read [**_here_**](Images/matrix_multiplication.pdf) for more details), does the computational complexity of matrix multiplication might reduce?  
+	![](Images/row_multiplication.png)  
+	- With A and B are [N x N] matrices, then the normal matrix multiplication has O(N^3) complexity
+	- However, I believe with the row/column multiplication, the computation complexity might reduce to O(N^2):
+		- Just a thought, maybe I'm wrong. Need to verify
+	- Then again, the multiplication inside the Scaled Dot-Product Attention is between two embeddings [1 x N], which has the complexity O(N^2), I do not think we can reduce the computational complexity with this simple row/column multiplication.
++ Another option is applying [**FFT**](https://en.wikipedia.org/wiki/Fast_Fourier_transform) (Fast Fourier Transform) to reduce the computation time
+	- In fact, it reduces the complexity from O(N^3) down to O(N.logN)
+	- But does it generalize well with the input embeddings of the Scaled Dot-Product Attention? Of course, the input embedding have to be normalized in prior, but what if we want to work with different shape of input i.e. high-resolution images? 
+
+## **Classification Transformer**
+This section introduces trasformer-based models for image classification and its sub-tasks (image pairing or multi-label classification). Of course, the paper reviewed list will be updated regularly.
+
+### Instance-level Image Retrieval using Reranking Transformers
++ **Paper**: https://arxiv.org/pdf/2103.12236.pdf  
+![](Images/RRT.png)  
++ **Reranking Transformers (RRTs)**: lightweight small & effective model learn to predict the similarity of image pair directly based on global & local descriptor
++ **Pipeline**: 
+	- 2 Image X, X' => _Global/Local feature discription_ => _preparation_ => _RRTs_ => z[cls] => _Binary Classifier_ => Do X and X' represent the same object/scene?
+	- **_Preparation_**: 
+		- Attach with 2 special tokiens at the head of X and X':
+			- [ClS]: summarize signal from both image
+			- [SEP]: to extra separator tokien (distinguise X and X')
+		- Positonal encoding
+	- **_Global/local representation_**: ResNet50 backbone; extra linear projector to reduce global descriptor dimension; L2 norm to unit norm
+	- **_RRTs_**:
+		- Same as the standard transformer layer: Skip_Connection[Input => MHSA] => Norm => MLP => Norm => ReLU; with 4 layers
+		- 6 layers with 4 MSHA head 
+	- **_Binary Classifier_**:
+		- Feature vector Z[Cls] from the last transformer layer as input
+		- 1 Linear layer with sigmoid
+		- Training with binary cross entropy
++ **Code**: https://github.com/uvavision/RerankingTransformer
+
+### General Multi-label Image Classification with Transformers
++ **Paper**: https://arxiv.org/pdf/2011.14027.pdf  
+![](Images/C-Tran.png)  
++ **C-Tran (Classificcation transformer)**: Transformer-based model for multi-label image classification that exploits dependencies among a target set of labels
+	- _Training_: Image & Mask Randome Label => C-Tran => predict masked label
+		- Learn to reconstruct a partial set of labels given randomly masked input label embedding
+	- _Inference_: Image & Mask Everything => C-Tran => predit all labels
+		- Predict a set of target labels by masking all the input labels as unknown
++ **Architecture**:
+	- Image => ResNet 101 => _feature embedding_ `Z`
+	- Image => _label embedding_ `L` (represent l possible label) => add with _state embedding_ `s` (with 3 state unknow `U`, negative `N`, positive `P`)
+	- `Z` & `L + s` => _C-Tran_ => `L'` (predicted label embedding) => _FFN_ => Y_hat (predicted label with posibility)
+		- **_C-Tran_**:
+			- Skip_Connection[MHSA => Norm] => Linear => ReLU => Linear
+			- 3 transformer layers with 4 MHSA
+		- **_FFN_**: label inference classifier with single linear layer & sigmoid activation
++ **Label Mask Training**:
+	+ During training:
+		- Randomly mask a certain amount of label
+			-  Given `L` possilbe label => number of "unknown" (masked) labels `0.25L` <= `n` <= `L`
+		- Using groundtruth of the other labels (via state embedding) => predict masked label (with cross entropy loss)
++ **Code**: to be updated
+
+## **Object Detection/Segmentation Transformer**
+This section introduces several attention-based architectures for object detection (DETR, AnchorDETR,...) and segmentation tasks (MaskFormer, TransUNet...), even for a specific task such as hand detection (HandsFormer). These architectures majorly are the combination of Transformer and CNN backbone for these sophisticated tasks, but few are solely based on the Transformer architecture (FTN).
 
 ### DETR (Detection Transformer)
 + **Paper**: https://arxiv.org/pdf/2005.12872.pdf  
@@ -162,9 +334,9 @@ Keep updated
 	- However, the self-attention in the encoder and  decoder blocks are replaced by Row-Column Decouple Attention
 + **Row-Column Decouple Attention**:
 	- Help reduce the GPU memeory when facing with high-resolution feature
-	- Main idea:
+	- _Main idea_:
 		- Decouple key feature `Kf` into row feature `Kf,x` and column feature `Kf,y` by 1D global average pooling
-		- Then perform the row attetion and column attentions speparately
+		- Then perform the row attetion and column attentions separately
 + **Code**: https://github.com/megvii-research/AnchorDETR
 
 ### MaskFormer
@@ -305,53 +477,8 @@ Keep updated
 		- **_Density Decoder_**: integrate all encoder layer features => upsample to the same spatial resolution of input (include pixel suffle & bilinear upsampling x2) => concat => salient feature => Conv => sigmoid => saliency map
 + **Code**: https://github.com/OliverRensu/GLSTR
 
-## Image Classification Transformer
-
-### Instance-level Image Retrieval using Reranking Transformers
-+ **Paper**: https://arxiv.org/pdf/2103.12236.pdf  
-![](Images/RRT.png)  
-+ **Reranking Transformers (RRTs)**: lightweight small & effective model learn to predict the similarity of image pair directly based on global & local descriptor
-+ **Pipeline**: 
-	- 2 Image X, X' => _Global/Local feature discription_ => _preparation_ => _RRTs_ => z[cls] => _Binary Classifier_ => Do X and X' represent the same object/scene?
-	- **_Preparation_**: 
-		- Attach with 2 special tokiens at the head of X and X':
-			- [ClS]: summarize signal from both image
-			- [SEP]: to extra separator tokien (distinguise X and X')
-		- Positonal encoding
-	- **_Global/local representation_**: ResNet50 backbone; extra linear projector to reduce global descriptor dimension; L2 norm to unit norm
-	- **_RRTs_**:
-		- Same as the standard transformer layers: Skip_Connection[Input => MHSA] => Norm => MLP => Norm => ReLU; x 4 times
-		- 6 layers with 4 MSHA head 
-	- **_Binary Classifier_**:
-		- Feature vector Z[Cls] from the last transformer layer as input
-		- 1 Linear layer with sigmoid
-		- Training with binary cross entropy
-+ **Code**: https://github.com/uvavision/RerankingTransformer
-
-### General Multi-label Image Classification with Transformers
-+ **Paper**: https://arxiv.org/pdf/2011.14027.pdf  
-![](Images/C-Tran.png)  
-+ **C-Tran (Classificcation transformer)**: Transformer-based model for multi-label image classification that exploits dependencies among a target set of labels
-	- _Training_: Image & Mask Randome Label => C-Tran => predict masked label
-		- Learn to reconstruct a partial set of labels given randomly masked input label embedding
-	- _Inference_: Image & Mask Everything => C-Tran => predit all labels
-		- Predict a set of target labels by masking all the input labels as unknown
-+ **Architecture**:
-	- Image => ResNet 101 => _feature embedding_ `Z`
-	- Image => _label embedding_ `L` (represent l possible label) => add with _state embedding_ `s` (with 3 state unknow `U`, negative `N`, positive `P`)
-	- `Z` & `L + s` => _C-Tran_ => `L'` (predicted label embedding) => _FFN_ => Y_hat (predicted label with posibility)
-		- **_C-Tran_**:
-			- Skip_Connection[MHSA => Norm] => Linear => ReLU => Linear
-			- 3 transformer layers with 4 MHSA
-		- **_FFN_**: label inference classifier with single linear layer & sigmoid activation
-+ **Label Mask Training**:
-	+ During training:
-		- Randomly mask a certain amount of label
-			-  Given `l` possilbe label => number of "unknown" (masked) labels 0.25l <= `n` <= l
-		- Using groundtruth of the other labels (via state embedding) => predict masked label (with cross entropy loss)
-+ **Code**: to be updated
-
-## Few-shot Transformer
+## **Few-shot Transformer**
+This section introduces transformer-based architecture for few-shot learning, mainly for but not strictly to the object detection and segmentation area. Overall, these pipeline architectures are quite complex, so I recommend you should read the paper along with these reviewes for better understanding. Then again, this list will be updated regularly.
 
 ### Meta-DETR: Image-Level Few-Shot Object Detection with Inter-Class Correlation Exploitation
 + **Paper**: https://arxiv.org/pdf/2103.11731.pdf  
@@ -511,10 +638,3 @@ Keep updated
 <br><br>
 <br><br>
 These notes were created by [quanghuy0497](https://github.com/quanghuy0497/Transformer4Vision)@2021
-
-
-
-### Upcoming: 
-+ Efficient Attention: https://arxiv.org/pdf/1812.01243v9.pdf
-+ How to train ViT: https://arxiv.org/pdf/2106.10270.pdf
-+ Conv Block Attention Module: https://arxiv.org/pdf/1807.06521v2.pdf
