@@ -192,7 +192,7 @@ This section introduces techniques of training vision transformer-based model ef
 + **Paper**:  https://arxiv.org/pdf/1812.01243v9.pdf  
 ![](Images/Efficient_Attention.png)  
 + **Efficient Attention**:
-	- Linear memory and computational complexity O(n)
+	- Linear memory and computational complexity **O(n)**
 	- Possess the same representational power as the convention dot-product attention
 	- Actually, it comes with better performance than the convention attention
 + **Method**:
@@ -205,7 +205,7 @@ This section introduces techniques of training vision transformer-based model ef
 		- The `K^T.V` (denoted _Global Context Vectors_ `G`) have the shape [k, d] with `k` & `d` are constants and can be determined => O(1)
 		- Then, `Q.G` have the shape [n, d] => O(k.d.n) or **O(n)** 
 + Then, the _Dot-product Attetion_ and the _Efficient Attention_ are equivalence with each other with mathematic proof:
-	![](Images/Dot_Efficient_comparison)
+	![](Images/Dot_Efficient_comparison.png)
 + Explanation from the author: https://cmsflash.github.io/ai/2019/12/02/efficient-attention.html
 + **Code**:
 	- https://github.com/cmsflash/efficient-attention
@@ -214,7 +214,7 @@ This section introduces techniques of training vision transformer-based model ef
 ### Linformer
 + **Paper**: https://arxiv.org/pdf/2006.04768.pdf  
 ![](Images/Linformer.png)  
-+ The convention Scaled Dot-Product Attention is decomposed into multiple smaller attentions through linear projections, such that the combination of these operations forms a low-rank factorization of the original attention. Reduce the complexity to O(n) in time and space
++ The convention Scaled Dot-Product Attention is decomposed into multiple smaller attentions through linear projections, such that the combination of these operations forms a low-rank factorization of the original attention. Reduce the complexity to **O(n)** in time and space
 + **Method**:
 	- Add two linear projection matrices `Ei` and `Fi` [n, k] when computing `K` & `V`
 		- From `K`, `V` with shape [n, d] => `Ei.K`, `Fi.V` with shape [k, d]
