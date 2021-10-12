@@ -196,14 +196,13 @@ This section introduces techniques of training vision transformer-based model ef
 	- Possess the same representational power as the convention dot-product attention
 	- Actually, it comes with better performance than the convention attention
 + **Method**:
-	- Initially, feature X => 3 linears => `Q`: [n, k]; `K`: [n, k]; `V`: [n, d] with k and d are the dimensionalities of keys and input representation (or embedding).
-	- The **_Dot-product Attetion_** is calculated by: `D(Q,K,V) = p(Q.K^T).V`. => scale with `sqrt(k)` => sigmoid
-		- p is the normalization
+	- Initially, feature X => 3 linears => `Q` [n, k]; `K` [n, k]; `V` [n, d] with `k` and `d` are the dimensionalities of keys and input representation (or embedding).
+	- The **_Dot-product Attetion_** is calculated by: `D(Q,K,V) = (Q.K^T).V` => scale with `n` => sigmoid
 		- The `Q.K^T` (denoted _Pairwise similarity_ `S`) have the shape [n, n] => `S.V` have the shape [n, d] => **O(n^2.d)**
-	- The **_Efficient Attention_** is calculated by: `E(Q,K,V) = p(Q.(K^T.V))` => scales with `sqrt(n)` => sigmoid
+	- The **_Efficient Attention_** is calculated by: `E(Q,K,V) = Q.(K^T.V)` => scales with `sqrt(n)` => sigmoid
 		- p is the normalization
-		- The `K^T.V` (denoted _Global Context Vectors_ `G`) have the shape [k, d] with `k` & `d` are constants and can be determined => O(1)
-		- Then, `Q.G` have the shape [n, d] => O(k.d.n) or **O(n)** 
+		- The `K^T.V` (denoted _Global Context Vectors_ `G`) have the shape [k, d] with `k` & `d` are constants and can be determined => _O(1)_
+		- Then, `Q.G` have the shape [n, d] => _O(k.d.n)_ or **O(n)** 
 + Then, the _Dot-product Attetion_ and the _Efficient Attention_ are equivalence with each other with mathematic proof:
 	![](Images/Dot_Efficient_comparison.png)
 + **Explanation from the author**: https://cmsflash.github.io/ai/2019/12/02/efficient-attention.html
@@ -218,8 +217,8 @@ This section introduces techniques of training vision transformer-based model ef
 + **Method**:
 	- Add two linear projection matrices `Ei` and `Fi` [n, k] when computing `K` & `V`
 		- From `K`, `V` with shape [n, d] => `Ei.K`, `Fi.V` with shape [k, d]
-	- Then, calculate the Scaled Dot-Product Attention as usual. The operation only requires **O(nk)** time and space complexity.
-		- If the projected dimension `k` is very small in comparison with `n`, then _O(n)_
+	- Then, calculate the Scaled Dot-Product Attention as usual. The operation only requires **O(n.k)** time and space complexity.
+		- If the projected dimension `k` >> `n`, then the complexity is _O(n)_
 + **Code**: 
 	- https://github.com/tatp22/linformer-pytorch
 	- https://github.com/lucidrains/linformer
@@ -227,7 +226,7 @@ This section introduces techniques of training vision transformer-based model ef
 ### Longformer
 + **Paper**: https://arxiv.org/pdf/2004.05150.pdf  
 ![](Images/Longformer.png)  
-+ Longformer is developed for long document in NLP, but it can also be applied for video processing
++ Longformer is developed with linear scale **O(n)** for long sequences processing in NLP, but it can also be applied for video processing
 + **Method**:
 	- **_Sliding Window_**: 
 		- With an arbitrary window size `w`, each token in the sequence will only attend to some `w` tokens (mostly `w/2` on each side) => the computation complexity is _O(n x w)_
