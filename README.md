@@ -206,7 +206,7 @@ This section introduces techniques of training vision transformer-based model ef
 		- Then, `Q.G` have the shape [n, d] => O(k.d.n) or **O(n)** 
 + Then, the _Dot-product Attetion_ and the _Efficient Attention_ are equivalence with each other with mathematic proof:
 	![](Images/Dot_Efficient_comparison.png)
-+ Explanation from the author: https://cmsflash.github.io/ai/2019/12/02/efficient-attention.html
++ **Explanation from the author**: https://cmsflash.github.io/ai/2019/12/02/efficient-attention.html
 + **Code**:
 	- https://github.com/cmsflash/efficient-attention
 	- https://github.com/lucidrains/linear-attention-transformer
