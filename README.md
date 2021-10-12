@@ -198,11 +198,11 @@ This section introduces techniques of training vision transformer-based model ef
 + **Method**:
 	- Initially, feature X => 3 linears => `Q` [n, k]; `K` [n, k]; `V` [n, d] with `k` and `d` are the dimensionalities of keys and input representation (or embedding).
 	- The **_Dot-product Attetion_** is calculated by: `D(Q,K,V) = softmax(Q*K^T)*V` => scale with `sqrt(k)`
-		- The `Q.K^T` (denoted _Pairwise similarity_ `S`) have the shape [n, n] => `S.V` have the shape [n, d] => **O(n^2.d)**
+		- The `Q*K^T` (denoted _Pairwise similarity_ `S`) have the shape [n, n] => `S*V` have the shape [n, d] => **O(n^2.d)**
 	- The **_Efficient Attention_** is calculated by: `E(Q,K,V) = softmax(Q)*softmax(K^T*V)` => scales with `sqrt(n)`
 		- p is the normalization
-		- The `K^T.V` (denoted _Global Context Vectors_ `G`) have the shape [k, d] with `k` & `d` are constants and can be determined => _O(1)_
-		- Then, `Q.G` have the shape [n, d] => _O(k.d.n)_ or **O(n)** 
+		- The `K^T*V` (denoted _Global Context Vectors_ `G`) have the shape [k, d] with `k` & `d` are constants and can be determined => _O(1)_
+		- Then, `Q*G` have the shape [n, d] => _O(k.d.n)_ or **O(n)** 
 + Then, the _Dot-product Attetion_ and the _Efficient Attention_ are equivalence with each other with mathematic proof:
 	![](Images/Dot_Efficient_comparison.png)
 + **Explanation from the author**: https://cmsflash.github.io/ai/2019/12/02/efficient-attention.html
@@ -216,7 +216,7 @@ This section introduces techniques of training vision transformer-based model ef
 + The convention Scaled Dot-Product Attention is decomposed into multiple smaller attentions through linear projections, such that the combination of these operations forms a low-rank factorization of the original attention. Reduce the complexity to **O(n)** in time and space
 + **Method**:
 	- Add two linear projection matrices `Ei` and `Fi` [n, k] when computing `K` & `V`
-		- From `K`, `V` with shape [n, d] => `Ei.K`, `Fi.V` with shape [k, d]
+		- From `K`, `V` with shape [n, d] => `Ei*K`, `Fi*V` with shape [k, d]
 	- Then, calculate the Scaled Dot-Product Attention as usual. The operation only requires **O(n.k)** time and space complexity.
 		- If the projected dimension `k` >> `n`, then the complexity is _O(n)_
 + **Code**: 
@@ -229,7 +229,7 @@ This section introduces techniques of training vision transformer-based model ef
 + Longformer is developed with linear scale **O(n)** for long sequences processing in NLP, but it can also be applied for video processing
 + **Method**:
 	- **_Sliding Window_**: 
-		- With an arbitrary window size `w`, each token in the sequence will only attend to some `w` tokens (mostly `w/2` on each side) => the computation complexity is _O(n x w)_
+		- With an arbitrary window size `w`, each token in the sequence will only attend to some `w` tokens (mostly `w/2` on each side) => the computation complexity is _O(n.w)_
 		- With `l` layers of the transformer, the receptive field of the sliding window attention is [l x w]
 	- **_Dilated Sliding Window_**:
 		- To further increase the receptive field without increasing computation, the sliding window can be “dilated”, similar to the dilated CNNs
@@ -246,10 +246,10 @@ This section introduces techniques of training vision transformer-based model ef
 ### Personal hyotheses
 + I wonder if we apply the **row/column multiplication** methods (read [**_here_**](Images/matrix_multiplication.pdf) for more details), does the computational complexity of matrix multiplication might reduce?  
 	![](Images/row_multiplication.png)  
-	- With A and B are [N x N] matrices, then the normal matrix multiplication has O(N^3) complexity
+	- With A and B are [N, N] matrices, then the normal matrix multiplication has O(N^3) complexity
 	- However, I believe with the row/column multiplication, the computation complexity might reduce to O(N^2):
 		- Just a thought, maybe I'm wrong. Need to verify
-	- Then again, the multiplication inside the Scaled Dot-Product Attention is between two embeddings [1 x N], which has the complexity O(N^2), I do not think we can reduce the computational complexity with this simple row/column multiplication.
+	- Then again, the multiplication inside the Scaled Dot-Product Attention is between two embeddings [1, N], which has the complexity O(N^2), I do not think we can reduce the computational complexity with this simple row/column multiplication.
 + Another option is applying [**FFT**](https://en.wikipedia.org/wiki/Fast_Fourier_transform) (Fast Fourier Transform) to reduce the computation time
 	- In fact, it reduces the complexity from O(N^3) down to O(N.logN)
 	- But does it generalize well with the input embeddings of the Scaled Dot-Product Attention? Of course, the input embedding have to be normalized in prior, but what if we want to work with different shape of input i.e. high-resolution images? 
@@ -389,7 +389,7 @@ This section introduces several attention-based architectures for object detecti
 	- Image => Patch => PGT Encoder => FPT Decoder => linear layer => bilinear upsampling => probability map => argmax(prob_map) => Segmentation
 	- **_PGT_**: four hierarchical stages that generate features with multiple scales, include Patch Transform (non-overlapping) + PGT Block to to extract hierarchical representations
 		+ PGT Block: Skip_Connection[Norm => PG-MSA] => Skip_Connection[Norm => MLP]
-		+ **_PG-MSA (Pyramid-group transformer block)_**: `Head_ij`=Attention(Qij,Kij,Vij) => `hi` = reshape(Head_ij) => PG-MSA = Concat(`hi`)
+		+ **_PG-MSA (Pyramid-group transformer block)_**: `Head_ij` = Attention(Qij, Kij, Vij) => `hi` = reshape(Head_ij) => PG-MSA = Concat(`hi`)
 	- **_FPT_**: aggregate the information from multiple levels of PGT encoder => generate finer semantic image segmentation
 		+ The scale of FPT is not larger the better for segmentation (with limited segmentation training data) => determined by depth, embedding dim, and the reduction ratio of SR-MSA 
 		+ **_SR-MSA (Spatial-reduction transformer block)_**: reduce memory and computation cost by spatially reducing the number of Key & Value tokiens, especially for high-resoluton representations
