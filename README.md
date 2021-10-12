@@ -13,7 +13,7 @@ The paper summarizations list will be updated regularly.
 	* [ViTGAN (Vision Transformer GAN)](#VitGAN-Vision-Transformer-GAN)
 	* [Conv Block Attention Module](#Conv-Block-Attention-Module)
 	* [Do Vision Transformer see like CNN?](#Do-Vision-Transformer-see-like-CNN)
-* [**Optimization Transformer**](#Optimization-Transformer)
+* [**Transformer Optimization**](#Transformer-Optimization)
 	* [How to train ViT?](#How-to-train-ViT)
 	* [Efficient Attention](#Efficient-Attention)
 	* [Linformer](#Linformer)
@@ -156,7 +156,7 @@ This section introduces original transformer architecture in NLP as well as its 
 	- While lower layer representations have _high similarity_ even with 10% of the data, higher layers and larger models _require significantly more data_ to learn similar representations.
 	- Larger ViT models develop _significantly stronger intermediate_ representations through _larger pre-training datasets_ than the ResNets.
 
-## **Optimization Transformer** 
+## **Transformer Optimization**
 This section introduces techniques of training vision transformer-based model effectively with optimization methods (data, augmentation, regularization,...). As the Scaled Dot-Product Attention comes with quadratic complexity **O(N^2)**, several approaches (Efficient Attention, Linformer) are introduced to reduce the computational complexity down to linear **O(N)**. Finally, I have some hypotheses (which aren't certainly proved) for the complexity optimization of matmul technique.
 
 ### How to train ViT?
@@ -622,7 +622,7 @@ This section introduces transformer-based architecture for few-shot learning, ma
 	- Finally, the multi-head URT `O(X)` is the concatenation of all `O(x)`, just like usual.
 + **Code**: https://github.com/liulu112601/URT
 
-## Resources
+## **Resources**
 + Paper collections about Transformer in Computer Vision: 
 	- https://github.com/dk-liang/Awesome-Visual-Transformer
 	- https://github.com/DirtyHarryLYL/Transformer-in-Vision
