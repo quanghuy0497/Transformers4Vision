@@ -197,9 +197,9 @@ This section introduces techniques of training vision transformer-based model ef
 	- Actually, it comes with better performance than the convention attention
 + **Method**:
 	- Initially, feature X => 3 linears => `Q` [n, k]; `K` [n, k]; `V` [n, d] with `k` and `d` are the dimensionalities of keys and input representation (or embedding).
-	- The **_Dot-product Attetion_** is calculated by: `D(Q,K,V) = (Q.K^T).V` => scale with `n` => sigmoid
+	- The **_Dot-product Attetion_** is calculated by: `D(Q,K,V) = softmax(Q*K^T)*V` => scale with `sqrt(k)`
 		- The `Q.K^T` (denoted _Pairwise similarity_ `S`) have the shape [n, n] => `S.V` have the shape [n, d] => **O(n^2.d)**
-	- The **_Efficient Attention_** is calculated by: `E(Q,K,V) = Q.(K^T.V)` => scales with `sqrt(n)` => sigmoid
+	- The **_Efficient Attention_** is calculated by: `E(Q,K,V) = softmax(Q)*softmax(K^T*V)` => scales with `sqrt(n)`
 		- p is the normalization
 		- The `K^T.V` (denoted _Global Context Vectors_ `G`) have the shape [k, d] with `k` & `d` are constants and can be determined => _O(1)_
 		- Then, `Q.G` have the shape [n, d] => _O(k.d.n)_ or **O(n)** 
