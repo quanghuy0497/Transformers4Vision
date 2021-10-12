@@ -203,7 +203,7 @@ This section introduces techniques of training vision transformer-based model ef
 		- p is the normalization
 		- The `K^T*V` (denoted _Global Context Vectors_ `G`) have the shape [k, d] with `k` & `d` are constants and can be determined => _O(1)_
 		- Then, `Q*G` have the shape [n, d] => _O(k.d.n)_ or **O(n)** 
-+ Then, the _Dot-product Attetion_ and the _Efficient Attention_ are equivalence with each other with mathematic proof:
++ _Dot-product Attetion_ and _Efficient Attention_ are equivalence with each other with mathematic proof:
 	![](Images/Dot_Efficient_comparison.png)
 + **Explanation from the author**: https://cmsflash.github.io/ai/2019/12/02/efficient-attention.html
 + **Code**:
