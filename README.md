@@ -18,7 +18,7 @@ The paper summarizations list will be updated regularly.
 	* [Efficient Attention](#Efficient-Attention)
 	* [Linformer](#Linformer)
 	* [Longformer](#Longformer)
-	* [Personal thoughts](#Personal-thoughts)
+	* [Personal hypotheses](#Personal-hypotheses)
 * [**Classification Transformer**](#Classification-Transformer)
 	* [Instance-level Image Retrieval using Reranking Transformers](#Instance-Level-Image-Retrieval-using-Reranking-Transformers)
 	* [General Multi-label Image Classification with Transformers](#General-Multi-Label-Image-Classification-with-Transformers)
@@ -244,7 +244,7 @@ This section introduces techniques of training vision transformer-based model ef
 		- This provides flexibility to model the different types of attention patterns
 + **Code**: https://github.com/allenai/longformer
 
-### Personal thoughts
+### Personal hyotheses
 + I wonder if we apply the **row/column multiplication** methods (read [**_here_**](Images/matrix_multiplication.pdf) for more details), does the computational complexity of matrix multiplication might reduce?  
 	![](Images/row_multiplication.png)  
 	- With A and B are [N x N] matrices, then the normal matrix multiplication has O(N^3) complexity
