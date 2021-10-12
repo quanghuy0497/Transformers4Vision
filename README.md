@@ -40,7 +40,7 @@ The paper summarizations list will be updated regularly.
 	* [Few-shot Semantic Segmentation with Classifier Weight Transformer](#Few-shot-Semantic-Segmentation-with-Classifier-Weight-Transformer)
 	* [Few-shot Transformation of Common Actions into Time and Space](#Few-shot-Transformation-of-Common-Actions-into-Time-And-Space)
 	* [A Universal Representation Transformer Layer for Few-Shot Image Classification](#A-Universal-Representation-Transformer-Layer-for-Few-Shot-Image-Classification)
-* [Resources](#Resources)
+* [**Resources**](#Resources)
 
 ## **Standard Transformer**
 This section introduces original transformer architecture in NLP as well as its versions in Computer Vision, including ViT for image classification, VTN for video classification, and ViTGAN for the generative adversarial network. Finally, a deep comparision between ViT and ResNet is introduced, to see deep down if the anttention-based model is similar to the Conv-based model.
