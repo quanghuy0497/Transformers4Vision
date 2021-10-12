@@ -192,7 +192,7 @@ This section introduces techniques of training vision transformer-based model ef
 + **Paper**:  https://arxiv.org/pdf/1812.01243v9.pdf  
 ![](Images/Efficient_Attention.png)  
 + **Efficient Attention**:
-	- Linear memory and computational complexity O(k.d.n)
+	- Linear memory and computational complexity O(n)
 	- Possess the same representational power as the convention dot-product attention
 	- Actually, it comes with better performance than the convention attention
 + **Method**:
@@ -202,8 +202,8 @@ This section introduces techniques of training vision transformer-based model ef
 		- The `Q.K^T` (denoted _Pairwise similarity_ `S`) have the shape [n, n] => `S.V` have the shape [n, d] => **O(n^2.d)**
 	- The **_Efficient Attention_** is calculated by: `E(Q,K,V) = p(Q.(K^T.V))` => scales with `sqrt(n)` => sigmoid
 		- p is the normalization
-		- The `K^T.V` (denoted _Global Context Vectors_ `G`) have the shape [k, d] with `k` & `d` are constants => O(1)
-		- Then, `Q.G` have the shape [n, d] => **O(n)** 
+		- The `K^T.V` (denoted _Global Context Vectors_ `G`) have the shape [k, d] with `k` & `d` are constants and can be determined => O(1)
+		- Then, `Q.G` have the shape [n, d] => O(k.d.n) or **O(n)** 
 + Then, the _Dot-product Attetion_ and the _Efficient Attention_ are equivalence with each other with mathematic proof:
 	![](Images/Dot_Efficient_comparison)
 + Explanation from the author: https://cmsflash.github.io/ai/2019/12/02/efficient-attention.html
