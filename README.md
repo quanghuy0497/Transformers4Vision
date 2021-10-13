@@ -250,10 +250,14 @@ This section introduces techniques of training vision transformer-based model ef
 	- With A and B are [N, N] matrices, then the normal matrix multiplication has O(N^3) complexity
 	- However, I believe with the row/column multiplication, the computation complexity might reduce to O(N^2):
 		- Just a thought, maybe I'm wrong. Need to verify
-	- Then again, the multiplication inside the Scaled Dot-Product Attention is between two embeddings [1, N], which has the complexity O(N^2), I do not think we can reduce the computational complexity with this simple row/column multiplication.
+	- Then again, the multiplication inside the Scaled Dot-Product Attention is between two embeddings [c, N], which has the complexity O(N^2), I do not think we can reduce the computational complexity with this simple row/column multiplication.
 + Another option is applying [**FFT**](https://en.wikipedia.org/wiki/Fast_Fourier_transform) (Fast Fourier Transform) to reduce the computation time
 	- In fact, it reduces the complexity from O(N^3) down to O(N.logN)
 	- But does it generalize well with the input embeddings of the Scaled Dot-Product Attention? Of course, the input embedding have to be normalized in prior, but what if we want to work with different shape of input i.e. high-resolution images? 
++ Furthermore, there are **several optimization techniques** for Scaled Dot-Product Attention that are presented in detailed in the below sections, including:
+	- Matmul(K.T, V) instead of Matmul(Q, K.T), similar to Efficient Attention: [FANet](#Real-time-Semantic-Segmentation-with-Fast-Attention-FANet)
+	- Subsample Q, K, or V: [SegFormer](#segformer), [UTNet](#utnet-u-shape-transformer-networks)
+	- Sultiply the horiontal and vertial separately, then combine later: [AnchorDETR](#AnchorDETR), [SOTR](#sotr-segmenting-objects-with-transformer)
 
 ## **Classification Transformer**
 This section introduces trasformer-based models for image classification and its sub-tasks (image pairing or multi-label classification). Of course, the paper reviewed list will be updated regularly.
@@ -507,10 +511,10 @@ This section introduces several attention-based architectures for object detecti
 	- At frame t, the FA module can be calculated (through several transform steps) by:
 		- `FAt = 1/n*L2_norm(Qt)*[F(Kt, Vt) + sum(F(Kt-i, Vt-i))]`
 			- Where `F(K, T) = L2_norm(K^T)*V`
-		- However, the `F(Kt-i, Vt-i)` have already been computed and the prior steps and _can be simply **reused** again_ for this step
+		- However, the `F(Kt-i, Vt-i)` have already been computed in the prior steps and _can be simply **reused** again_ for this step
 		- Therefore, the spatial-temporal fast attention still maintains the complexity of **_O(n.c^2)_**, which is not only fast but also free of `t`
 	- Then, the normal FA module can be replaced by this spatial-temporal version for video semantic segmentation _without increasing computational cost_
-+ **Code**: https://cs-people.bu.edu/pinghu/FANet.html
++ **Code**: https://github.com/feinanshan/FANet
 
 ## **Few-shot Transformer**
 This section introduces transformer-based architecture for few-shot learning, mainly for but not strictly to the object detection and segmentation area. Overall, these pipeline architectures are quite complex, so I recommend you should read the paper along with these reviewes for better understanding. Then again, this list will be updated regularly.
