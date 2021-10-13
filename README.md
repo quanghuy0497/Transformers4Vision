@@ -33,6 +33,7 @@ The paper summarizations list will be updated regularly.
 	* [SOTR (Segmenting Objects with Transformer)](#SOTR-Segmenting-Objects-with-Transformer)
 	* [HandsFormer](#HandsFormer)
 	* [Unifying Global-Local Representations in Salient Object Detection with Transformer](#Unifying-Global-Local-Representations-in-Salient-Object-Detection-with-Transformer)
+	* [Real-time Semantic Segmentation with Fast Attention (FANet)](#Real-time-Semantic-Segmentation-with-Fast-Attention-FANet)
 * [**Few-shot Transformer**](#Few-shot-transformer)
 	* [Meta-DETR: Image-Level Few-Shot Object Detection with Inter-Class Correlation Exploitation](#Meta-DETR-Image-Level-Few-Shot-Object-Detection-With-Inter-Class-Correlation-Exploitation)
 	* [Boosting Few-shot Semantic Segmentation with Transformers](#Boosting-Few-shot-Semantic-Segmentation-with-Transformers)
@@ -218,7 +219,7 @@ This section introduces techniques of training vision transformer-based model ef
 	- Add two linear projection matrices `Ei` and `Fi` [n, k] when computing `K` & `V`
 		- From `K`, `V` with shape [n, d] => `Ei*K`, `Fi*V` with shape [k, d]
 	- Then, calculate the Scaled Dot-Product Attention as usual. The operation only requires **O(n.k)** time and space complexity.
-		- If the projected dimension `k` >> `n`, then the complexity is _O(n)_
+		- If the projected dimension _k >> n_, then the complexity is _O(n)_
 + **Code**: 
 	- https://github.com/tatp22/linformer-pytorch
 	- https://github.com/lucidrains/linformer
@@ -239,7 +240,7 @@ This section introduces techniques of training vision transformer-based model ef
 		- The windowed and dilated attention are not flexible enough to learn task-specific representation 
 		- The global attention is added to few pre-selected input locations to tackle the problem.
 	- **_Linear Projection for Global Attention_**:
-		- 2 separate sets [Qs, Ks, Vs] and [Qg, Kg, Vg] was used for sliding window and global attention, respectively
+		- 2 separate sets {Qs, Ks, Vs} and {Qg, Kg, Vg} was used for sliding window and global attention, respectively
 		- This provides flexibility to model the different types of attention patterns
 + **Code**: https://github.com/allenai/longformer
 
@@ -476,6 +477,42 @@ This section introduces several attention-based architectures for object detecti
 		- **_Density Decoder_**: integrate all encoder layer features => upsample to the same spatial resolution of input (include pixel suffle & bilinear upsampling x2) => concat => salient feature => Conv => sigmoid => saliency map
 + **Code**: https://github.com/OliverRensu/GLSTR
 
+### Real-time Semantic Segmentation with Fast Attention (FANet)
++ **Paper**: https://arxiv.org/pdf/2007.03815v2.pdf  
+![](Images/FANet.png)  
++ **_FA Module_**:
+	- FA module for non-local _context aggregation_ for efficient segmentation. 
+	+ **_Fast Attention_** = `1/n*L2_norm(Q)*[L2_norm(K^T)*V]`
+		- n = height x width, `L2_norm(K^T)*V` is compute first
+		- L2_norm to ensure the affinity is between [-1, 1]
+		- Computational complexity **_O(n.c^2)_**
+	- `n/c` times more efficient than the standard self-attention, given _n>>c_
++ **Fast Attention Network (FANet)** for real-time semantic segmentation:
+	- Three components: Encoder, context aggregation, Decoder
+	+ **_Encoder_**:
+		- Extract features from image input at different semantic levels
+		- Lightweight backbone ResNet-18/34 without last FC layer
+			- The first Res-block "Res-1" produces feature map of [h/4, w/4]
+			- The other subsequence blocks output feature maps with resolution downsampled by a factor of 2
+		- Apply Context Aggregation (FA module) at each stage
+		- Down-sapmpling Res-4 and Res4 for spatial reduction
+	+ **_Context Aggregation_**:
+		- Basically, the FA module, composed of 3 Conv1x1 layers (without ReLU) for embedding input feature to be {Q, K, V}
+	+ **_Decoder_**:
+		- Merges and upsamples the features (outputs of FA module) in sequence from deep feature maps to shallow ones
+		- Skip connection to connect middle features => enhanced decoded feature with high-level content
+		- Output with [h/4, w/4]
++ **FA module extending for Video Semantic Segmentation**:  
+	![](Images/FANet_spatial_temporal.png)  
+	- Extend FA module to spatial-temporal contexts => improves video semantic segmentation without increasing computational cost
+	- At frame t, the FA-module can be calculated by:
+		- `FAt = f(Qt, Kt, Vt) + sum[f(Qt, Ki, Vi)]`
+			- With f(Q,K,T) is the FA module formula and `i` is the previous frame {1,...t-1}
+		- However, the `L2_Norm(Ki^T).Vi` have already been computed and the prior steps and can be simply reused
+		- Therefore, the spatial-temporal fast attention still maintains the complexity of `O(n.c^2)`, which is not only fast but also free of `t`
+	- Then, the normal FA module can be replaced by its spatial-temporal version for video semantic segmentation without increasing computational cost
++ **Code**: https://cs-people.bu.edu/pinghu/FANet.html
+
 ## **Few-shot Transformer**
 This section introduces transformer-based architecture for few-shot learning, mainly for but not strictly to the object detection and segmentation area. Overall, these pipeline architectures are quite complex, so I recommend you should read the paper along with these reviewes for better understanding. Then again, this list will be updated regularly.
 
@@ -492,11 +529,11 @@ This section introduces transformer-based architecture for few-shot learning, ma
 	- Pipeline:
 		- Query & Support features => MHSA => ROIAlign + Average pooling (on the support feature only) => Query feature map `Q` & Support prototypes `S` 
 		- `S` = Concat(`S`, BG-Prototype); Task Encodings `T` = Concat(`T`, BG-Encoding)
-		- [`Q`, `S`, `T`] => Feature maching & Encoding matching (in parallel) => FFN => Support-Aggregated Query Features
+		- {`Q`, `S`, `T`} => Feature maching & Encoding matching (in parallel) => FFN => Support-Aggregated Query Features
 	- **_Feature matching_**:
-		- [`Q`, Sigmoid(`S`), `S`] => Single-Head Attention => Element-wise multiplication => feature matching output `Qf`
+		- {Q`, Sigmoid(`S`), `S`} => Single-Head Attention => Element-wise multiplication => feature matching output `Qf`
 	- **_Encoding Matching_**:
-		- [`T`, `Q`, `S`] => Single-Head Attention => encoding output `Qe`
+		- {`T`, `Q`, `S`} => Single-Head Attention => encoding output `Qe`
 	- **_FFN_**:
 		Element-wise Add(`Qf`, `Qe`) => FFN => Support-Aggregated Query features
 + **Transformer Encoder-Decoder**:
@@ -576,7 +613,7 @@ This section introduces transformer-based architecture for few-shot learning, ma
 	- **_First stage_**: pre-train encoder/decoder (**PSPNet** pre-trained on ImageNet) with supervised learning => stronger representation
 		- Support/Query Image => Encoder-Decoder (**PSPNet**) => Linear clasifier with Support Mask (Support only) => Classifier (Support only) => [Classifier weight `Q`, Query feature `K`, Query feature `V`]
 	- **_Second stage_**: meta-train the Classifier Weight Transformer (CWT) only (as the encoder-decoder capapble to capture generalization of unseen class)
-		- [`Q`,`K`,`V`] => Skip_Connection[Linear => MHSA => Norm] => Conv operation with `Q` => Prediction Mask
+		- {Q, K, V} => Skip_Connection[Linear => MHSA => Norm] => Conv operation with `Q` => Prediction Mask
 + **Code**: https://github.com/zhiheLu/CWT-for-FSS
 
 ### Few-shot Transformation of Common Actions into Time and Space
