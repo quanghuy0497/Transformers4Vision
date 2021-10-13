@@ -505,7 +505,7 @@ This section introduces several attention-based architectures for object detecti
 	![](Images/FANet_spatial_temporal.png)  
 	- Extend FA module to spatial-temporal contexts => improves video semantic segmentation without increasing computational cost
 	- At frame t, the FA module can be calculated (through several transform steps) by:
-		- `FAt = 1/n*L2_norm(Qt)*[F(Kt, Vt)+sum(F(Kt-i, Vt-i))]`
+		- `FAt = 1/n*L2_norm(Qt)*[F(Kt, Vt) + sum(F(Kt-i, Vt-i))]`
 			- Where `F(K, T) = L2_norm(K^T)*V`
 		- However, the `F(Kt-i, Vt-i)` have already been computed and the prior steps and _can be simply reused_ for this step
 		- Therefore, the spatial-temporal fast attention still maintains the complexity of **_O(n.c^2)_**, which is not only fast but also free of `t`
