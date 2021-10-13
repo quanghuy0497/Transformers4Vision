@@ -18,7 +18,7 @@ The paper summarizations list will be updated regularly.
 	* [Efficient Attention](#Efficient-Attention)
 	* [Linformer](#Linformer)
 	* [Longformer](#Longformer)
-	* [Personal hypotheses](#Personal-hypotheses)
+	* [Discussion](#Discussion)
 * [**Classification Transformer**](#Classification-Transformer)
 	* [Instance-level Image Retrieval using Reranking Transformers](#Instance-Level-Image-Retrieval-using-Reranking-Transformers)
 	* [General Multi-label Image Classification with Transformers](#General-Multi-Label-Image-Classification-with-Transformers)
@@ -244,7 +244,7 @@ This section introduces techniques of training vision transformer-based model ef
 		- This provides flexibility to model the different types of attention patterns
 + **Code**: https://github.com/allenai/longformer
 
-### Personal hypotheses
+### Discussion
 + I wonder if we apply the **row/column multiplication** methods (read [**_here_**](Images/matrix_multiplication.pdf) for more details), does the computational complexity of matrix multiplication might reduce?  
 	![](Images/row_multiplication.png)  
 	- With A and B are [N, N] matrices, then the normal matrix multiplication has O(N^3) complexity
@@ -254,10 +254,11 @@ This section introduces techniques of training vision transformer-based model ef
 + Another option is applying [**FFT**](https://en.wikipedia.org/wiki/Fast_Fourier_transform) (Fast Fourier Transform) to reduce the computation time
 	- In fact, it reduces the complexity from O(N^3) down to O(N.logN)
 	- But does it generalize well with the input embeddings of the Scaled Dot-Product Attention? Of course, the input embedding have to be normalized in prior, but what if we want to work with different shape of input i.e. high-resolution images? 
-+ Furthermore, there are **several optimization techniques** for Scaled Dot-Product Attention that are presented in detailed in the below sections, including:
-	- Matmul(K.T, V) instead of Matmul(Q, K.T), similar to Efficient Attention: [FANet](#Real-time-Semantic-Segmentation-with-Fast-Attention-FANet)
++ Furthermore, there are **more techniques** to reduce Scaled Dot-Product Attention complexity that are presented in detailed in the below sections, including:
+	- Matmul(K.T, V) instead of Matmul(Q, K.T): [FANet](#Real-time-Semantic-Segmentation-with-Fast-Attention-FANet)
 	- Subsample Q, K, or V: [SegFormer](#segformer), [UTNet](#utnet-u-shape-transformer-networks)
 	- Sultiply the horiontal and vertial separately, then combine later: [AnchorDETR](#AnchorDETR), [SOTR](#sotr-segmenting-objects-with-transformer)
+	- More techniques with correspondence complexity can be read in [here](https://github.com/Separius/awesome-fast-attention)
 
 ## **Classification Transformer**
 This section introduces trasformer-based models for image classification and its sub-tasks (image pairing or multi-label classification). Of course, the paper reviewed list will be updated regularly.
