@@ -157,7 +157,7 @@ This section introduces original transformer architecture in NLP as well as its 
 	- Larger ViT models develop _significantly stronger intermediate_ representations through _larger pre-training datasets_ than the ResNets.
 
 ## **Transformer Optimization**
-This section introduces techniques of training vision transformer-based model effectively with optimization methods (data, augmentation, regularization,...). As the Scaled Dot-Product Attention comes with quadratic complexity **O(N^2)**, several approaches (Efficient Attention, Linformer) are introduced to reduce the computational complexity down to linear **O(N)**. Finally, I have some hypotheses (which aren't certainly proved) for the complexity optimization of matmul technique.
+This section introduces techniques of training vision transformer-based model effectively with optimization methods (data, augmentation, regularization,...). As the Scaled Dot-Product Attention comes with quadratic complexity **O(N^2)**, several approaches (Efficient Attention, Linformer) are introduced to reduce the computational complexity down to linear **O(N)**.
 
 ### How to train ViT?
 + **Paper**: https://arxiv.org/pdf/2106.10270.pdf  
@@ -243,7 +243,7 @@ This section introduces techniques of training vision transformer-based model ef
 		- This provides flexibility to model the different types of attention patterns
 + **Code**: https://github.com/allenai/longformer
 
-### Personal hyotheses
+### Personal hypotheses
 + I wonder if we apply the **row/column multiplication** methods (read [**_here_**](Images/matrix_multiplication.pdf) for more details), does the computational complexity of matrix multiplication might reduce?  
 	![](Images/row_multiplication.png)  
 	- With A and B are [N, N] matrices, then the normal matrix multiplication has O(N^3) complexity
