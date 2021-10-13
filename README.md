@@ -482,7 +482,7 @@ This section introduces several attention-based architectures for object detecti
 ![](Images/FANet.png)  
 + **_FA Module_**:
 	- FA module for non-local _context aggregation_ for efficient segmentation. 
-	+ **_Fast Attention_** = `1/n*L2_norm(Q) * [L2_norm(K^T)*V]`
+	+ **_Fast Attention_** = `1/n*L2_norm(Q)*[L2_norm(K^T)*V]`
 		- n = height x width
 		- L2_norm to ensure the affinity is between [-1, 1]
 		- Computational complexity **_O(n.c^2)_**
@@ -505,9 +505,9 @@ This section introduces several attention-based architectures for object detecti
 	![](Images/FANet_spatial_temporal.png)  
 	- Extend FA module to spatial-temporal contexts => improves video semantic segmentation without increasing computational cost
 	- At frame t, the FA module can be calculated (through several transform steps) by:
-		- `FAt = 1/n*L2_norm(Qt) * (f(Kt, Vt) + sum[f(Kt-i, Vt-i)])`
-			- Where f(K,T) = `L2_Norm(K^T).V`
-		- However, the _f(Kt-i, Vt-i)_ have already been computed and the prior steps and can be simply reused
+		- `FAt = 1/n*L2_norm(Qt)*[F(Kt, Vt) + sum(F(Kt-i, Vt-i))]`
+			- Where F(K,T) = `L2_Norm(K^T)*V`
+		- However, the _F(Kt-i, Vt-i)_ have already been computed and the prior steps and can be simply reused
 		- Therefore, the spatial-temporal fast attention still maintains the complexity of **_O(n.c^2)_**, which is not only fast but also free of `t`
 	- Then, the normal FA module can be replaced by its spatial-temporal version for video semantic segmentation _without increasing computational cost_
 + **Code**: https://cs-people.bu.edu/pinghu/FANet.html
