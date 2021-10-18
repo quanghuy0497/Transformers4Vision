@@ -3,7 +3,7 @@ This repository summaries Transformer-based architectures in the Computer Vision
 
 The main purpose of this list is to review and recap only the main approach/pipeline/architecture of these papers to capture the overview of **transformers for vision**, so other parts of the papers e.g. experimental performance, comparison results won't be presented. For a better intuition, please read the original article and code that are attached along with the recap sections. Of course, there might be some mistakes when reviewing these papers, so if there is something wrong or inaccurate, please feel free to tell me.
 
-The paper summarizations list will be updated frequently.
+The paper summarization list will be updated frequently.
 
 ## Table of contents
 * [**Standard Transformer**](#Standard-Transformer)
