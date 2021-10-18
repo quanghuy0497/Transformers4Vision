@@ -3,7 +3,7 @@ This repository summaries Transformer-based architectures in the Computer Vision
 
 The main purpose of this list is to review and recap only the main approach/pipeline/architecture of these papers to capture the overview of **transformers for vision**, so other parts of the papers e.g. experimental performance, comparison results won't be presented. For a better intuition, please read the original article and code that are attached along with the recap sections. Of course, there might be some mistakes when reviewing these papers, so if there is something wrong or inaccurate, please feel free to tell me.
 
-The paper summarizations list will be updated regularly.
+The paper summarizations list will be updated frequently.
 
 ## Table of contents
 * [**Standard Transformer**](#Standard-Transformer)
@@ -27,6 +27,7 @@ The paper summarizations list will be updated regularly.
 	* [AnchorDETR](#AnchorDETR)
 	* [MaskFormer](#MaskFormer)
 	* [SegFormer](#SegFormer)
+	* [Segmenter](#Segmenter)
 	* [Fully Transformer Networks](#Fully-Transformer-Networks)
 	* [TransUNet](#TransUNet)
 	* [UTNet (U-shape Transformer Networks)](#UTNet-U-shape-Transformer-Networks)
@@ -47,23 +48,23 @@ The paper summarizations list will be updated regularly.
 This section introduces original transformer architecture in NLP as well as its versions in Computer Vision, including ViT for image classification, VTN for video classification, and ViTGAN for the generative adversarial network. Finally, a deep comparision between ViT and ResNet is introduced, to see deep down if the anttention-based model is similar to the Conv-based model.
 
 ### Original Transformer
-+ **Paper**: https://arxiv.org/abs/1706.03762
++ **Paper**: https://arxiv.org/pdf/1706.03762.pdf
 ![](Images/Transformer.png)  
 + **Input**: 
 	- Sequence embedding (e.g. word embeddings of a sentence)
 	- **Positional Encoding (PE)** => encode the _positions of embedding word within the sentence_ in the input of Encoder/Decoder block
 		- [_Detailed explanation_](https://kazemnejad.com/blog/transformer_architecture_positional_encoding/) of PE 
 + **Encoder**:
-	- Embedding words => Skip_Connection[**_MHSA_** => Norm] => Skip_Connection[**_FFN_** => Norm] => Encoder output
+	- Embedding words => Skip[**_MHSA_** => Norm] => Skip[**_FFN_** => Norm] => _Patch encoding_
 		- **_MHSA_**: Multi-Head Self Attention  
 			![](Images/MHSA.png)  
 		- **_FFN_**: FeedForward Neural Network
 	+ Repeat N times (N usually 6)
 + **Decoder**:
 	- Decoder input:
-		- Leaned output of the decoder (initial token in the begining, learned sentence throughout the process)
-		- Encoder input (put in the middle of the Decoder)
-	- (Input + Positional Encoding) => Skip_Connection[**_MHSA_** + Norm] => Skip_Connection[(+Encoder input) => **_MHSA_** => Norm] => Skip_Connection[**_FFN_** + Norm] => Linear => Softmax => Decoder Output
+		- Leaned output of the decoder (initial token in the begining, learned sentence throughout the process), shift right
+		- _Patch encoding_ (put in the middle of the Decoder)
+	- (Input + Positional Encoding) => Skip[**_MHSA_** + Norm] => Skip[(+ _Patch encoding_) => **_MHSA_** => Norm] => Skip[**_FFN_** + Norm] => Linear => Softmax => Decoder Output
 	- Using the decoder output as the input for next round, repeat N times (N ussually 6)
 + [Read here](https://github.com/quanghuy0497/Deep-Learning-Specialization/tree/main/Course%205%20-%20Sequence%20Models#transformer-network-1) to learn in detail about the MHSA and Transformer architectures
 	+ Also [here](https://phamdinhkhanh.github.io/2019/06/18/AttentionLayer.html) if you prefer detailed explanation in Vienamese
@@ -78,8 +79,8 @@ This section introduces original transformer architecture in NLP as well as its 
 	-  Image [H, W, C] => non-overlapped patches (conventionally 16x16 patch size) => flatten into sequence => linear projection (vectorized + Linear) => **_patch embeddings_**
 	- **_Positional encoding_** added to the patch embeddings for location information of the patchs sequence
 	- Extra learnable `[Cls]` token (embedding) + positional 0 => attached on the head of the embedding sequence (denote as `Z0`)
-+ **Architecture**: (Patch + Position Embedding) => Transformer Encoder => MLP Head for Classification
-	-  **_Transformer Encoder_**: Skip_Connection[Norm => **_MHSA_**] => Skip_Connection[Norm + **_MLP_**(Linear, GELU, Linear)] => output
++ **Architecture**: (Image Patches + Position Embedding) => Transformer Encoder => MLP Head for Classification
+	-  **_Transformer Encoder_**: Skip[Norm => **_MHSA_**] => Skip[Norm + **_MLP_**(Linear, GELU, Linear)] => output
 	- **_MLP Head for classification_**:  `C0` (output of `Z0` after went through the Transformer Encoder) => **_MLP Head_** (Linear + Softmax) => classified label
 + **Good video explanation**: https://www.youtube.com/watch?v=HZ4j_U3FC94
 + **Code**: https://github.com/lucidrains/vit-pytorch
@@ -102,7 +103,7 @@ This section introduces original transformer architecture in NLP as well as its 
 + **Architecture**:
 	+ **_Generator_**: Input latent `z` => _Mapping Network_ (MLP) => latent vector `w` => _Affine transform_ `A` => _Transformer Encoder_ => _Fourier Encoding_ (sinusoidal/sine activation) => `E_fou` => _2-layer MPL_ => Generated Patches
 		- **_Transformer Encoder_**: 
-			- Embedding position => Skip_Connection[SLN => MHSA] => Skip_Connection[SLN =>MLP] => output
+			- Embedding position => Skip[SLN => MHSA] => Skip[SLN =>MLP] => output
 			- SLN is called **_Self-modulated LayerNorm_** (as the modulation depends on no external information)
 				- The SLN formula is describe within the paper (Equation 14)
 			- Embedding `E` as initial input; `A` as middle inputs for the norm layers
@@ -261,7 +262,7 @@ This section introduces techniques of training vision transformer-based model ef
 	- More techniques with correspondence complexity can be read in [here](https://github.com/Separius/awesome-fast-attention)
 
 ## **Classification Transformer**
-This section introduces trasformer-based models for image classification and its sub-tasks (image pairing or multi-label classification). Of course, the paper reviewed list will be updated regularly.
+This section introduces trasformer-based models for image classification and its sub-tasks (image pairing or multi-label classification). Of course, the paper reviewed list will be updated frequently.
 
 ### Instance-level Image Retrieval using Reranking Transformers
 + **Paper**: https://arxiv.org/pdf/2103.12236.pdf  
@@ -276,7 +277,7 @@ This section introduces trasformer-based models for image classification and its
 		- Positonal encoding
 	- **_Global/local representation_**: ResNet50 backbone; extra linear projector to reduce global descriptor dimension; L2 norm to unit norm
 	- **_RRTs_**:
-		- Same as the standard transformer layer: Skip_Connection[Input => MHSA] => Norm => MLP => Norm => ReLU; with 4 layers
+		- Same as the standard transformer layer: Skip[Input => MHSA] => Norm => MLP => Norm => ReLU; with 4 layers
 		- 6 layers with 4 MSHA head 
 	- **_Binary Classifier_**:
 		- Feature vector Z[Cls] from the last transformer layer as input
@@ -297,7 +298,7 @@ This section introduces trasformer-based models for image classification and its
 	- Image => _label embedding_ `L` (represent l possible label) => add with _state embedding_ `s` (with 3 state unknow `U`, negative `N`, positive `P`)
 	- `Z` & `L + s` => _C-Tran_ => `L'` (predicted label embedding) => _FFN_ => Y_hat (predicted label with posibility)
 		- **_C-Tran_**:
-			- Skip_Connection[MHSA => Norm] => Linear => ReLU => Linear
+			- Skip[MHSA => Norm] => Linear => ReLU => Linear
 			- 3 transformer layers with 4 MHSA
 		- **_FFN_**: label inference classifier with single linear layer & sigmoid activation
 + **Label Mask Training**:
@@ -305,7 +306,7 @@ This section introduces trasformer-based models for image classification and its
 		- Randomly mask a certain amount of label
 			-  Given `L` possilbe label => number of "unknown" (masked) labels `0.25L` <= `n` <= `L`
 		- Using groundtruth of the other labels (via state embedding) => predict masked label (with cross entropy loss)
-+ **Code**: to be updated
++ **Code**: https://github.com/QData/C-Tran/
 
 ## **Object Detection/Segmentation Transformer**
 This section introduces several attention-based architectures for object detection (DETR, AnchorDETR,...) and segmentation tasks (MaskFormer, TransUNet...), even for a specific task such as hand detection (HandsFormer). These architectures majorly are the combination of Transformer and CNN backbone for these sophisticated tasks, but few are solely based on the Transformer architecture (FTN).
@@ -373,7 +374,7 @@ This section introduces several attention-based architectures for object detecti
 			- Provide both high and low-resolution features => boost the performance of semantic segmentation
 		- Transformer Block1: Efficient Self-Atnn => Mix-FNN => Overlap Patch Merging
 			- **_Efficient Self-Attention_**: Use the reduction ratio R on sequence length N = H x W (in particular, apply stride R) => reduce the complexity by R times
-			- **_Mix-FFN_**: Skip_Connection[MLP => Conv3x3 => GELU => MLP] which considers the effect of zero padding to leak location information (rather than positional encoding)
+			- **_Mix-FFN_**: Skip[MLP => Conv3x3 => GELU => MLP] which considers the effect of zero padding to leak location information (rather than positional encoding)
 			- **_Overlapped Patch Merging_**: similar to the image patch in ViT but overlap => combine feature patches
 + **Lightweight All-MLP Decoder**: fuse the multi-level features => predict semantic segmentation mask
 	1. **_1st Linear layer_**: unifying channel dimension of multi-level features `Fi` (from the encoder)  
@@ -381,6 +382,22 @@ This section introduces several attention-based architectures for object detecti
 	3. **_2nd Linear layer_**: fusing concatenated features `F`
 	4. **_3rd Linear layer_**: predicting segmentation mask M `[H/4, W/4, N_cls]` with `F`
 + **Code**: https://github.com/lucidrains/segformer-pytorch
+
+### Segmenter
++ **Paper**:  https://arxiv.org/pdf/2105.05633.pdf  
+![](Images/Segmenter.png)  
++ **Architecture**:
+	+ Image patches => _Flatten & project_ => + Positional Encoding => _Transformer Encoder_ => [Patch encoding + class embeddings] => _Decoder (Mask Transformer)_ => scalar product => upsample & argmax => Segmentation Map
+	+ **_Encoder_**: 
+		- Input `z0` + PE => Skip[Norm => MHSA] => Skip[Norm => 2 layers MLP] => Patch encoding `Zl`
+	+ **_Decoder_**: 
+		- _Input_: 
+			- Patch encoding `Zl`
+			- K learnable _class embeddings_ `cls` = [cls1,...cls_k] with K is the number of class. Each class embbedding is initial randomly & assigned to a single semantic class => generate the class mask
+		- _Mask Transformer_:
+			- `Zl` & `cls` => Transformer encoder => `Z'm` & `c`
+			- Masks(Z'm, c) = `L2_norm(Z'm).c^T` =>  reshaped into 2D `S_mask` => bilinearly upsample to the original size [H, W, K] => softmax => final segmentation mask
++ **Code**: https://github.com/rstrudel/segmenter
 
 ### Fully Transformer Networks
 + **Paper**: https://arxiv.org/pdf/2106.04108.pdf  
@@ -394,7 +411,7 @@ This section introduces several attention-based architectures for object detecti
 + **Architecture**:
 	- Image => Patch => PGT Encoder => FPT Decoder => linear layer => bilinear upsampling => probability map => argmax(prob_map) => Segmentation
 	- **_PGT_**: four hierarchical stages that generate features with multiple scales, include Patch Transform (non-overlapping) + PGT Block to to extract hierarchical representations
-		+ PGT Block: Skip_Connection[Norm => PG-MSA] => Skip_Connection[Norm => MLP]
+		+ PGT Block: Skip[Norm => PG-MSA] => Skip[Norm => MLP]
 		+ **_PG-MSA (Pyramid-group transformer block)_**: `Head_ij` = Attention(Qij, Kij, Vij) => `hi` = reshape(Head_ij) => PG-MSA = Concat(`hi`)
 	- **_FPT_**: aggregate the information from multiple levels of PGT encoder => generate finer semantic image segmentation
 		+ The scale of FPT is not larger the better for segmentation (with limited segmentation training data) => determined by depth, embedding dim, and the reduction ratio of SR-MSA 
@@ -446,8 +463,8 @@ This section introduces several attention-based architectures for object detecti
 			- Twin att. has a global receptive field & covers the information along 2 dimension
 		![](Images/Twin_Att.png)  
 		- Transformer layer:
-			- _Pure twin layer_: Skip_Connection[Norm => Twin Att.] => Skip_Connection[Norm => MLP]
-			- _Hybrid twin layer_: Skip_Connection[Norm => Twin Att.] => Skip_Connection[Conv3x3 => Leaky ReLU => Conv3x3]
+			- _Pure twin layer_: Skip[Norm => Twin Att.] => Skip[Norm => MLP]
+			- _Hybrid twin layer_: Skip[Norm => Twin Att.] => Skip[Conv3x3 => Leaky ReLU => Conv3x3]
 			- Hybrid Twin comes with the best performance
 	+  **_Multi-level upsampling model_**: P5 feature map + Positional from transformer + P2-P4 from FPN => [Conv3x3 => Group Norm => Relu, multi stage] => upsample x2, x4, x8 (for P3-P5) => added together => point-wise conv => upsamping => final `HxW` feature map
 + **Code**: https://github.com/easton-cau/SOTR
@@ -518,7 +535,7 @@ This section introduces several attention-based architectures for object detecti
 + **Code**: https://github.com/feinanshan/FANet
 
 ## **Few-shot Transformer**
-This section introduces transformer-based architecture for few-shot learning, mainly for but not strictly to the object detection and segmentation area. Overall, these pipeline architectures are quite complex, so I recommend you should read the paper along with these reviewes for better understanding. Then again, this list will be updated regularly.
+This section introduces transformer-based architecture for few-shot learning, mainly for but not strictly to the object detection and segmentation area. Overall, these pipeline architectures are quite complex, so I recommend you should read the paper along with these reviewes for better understanding. Then again, this list will be updated frequently.
 
 ### Meta-DETR: Image-Level Few-Shot Object Detection with Inter-Class Correlation Exploitation
 + **Paper**: https://arxiv.org/pdf/2103.11731.pdf  
@@ -617,7 +634,7 @@ This section introduces transformer-based architecture for few-shot learning, ma
 	- **_First stage_**: pre-train encoder/decoder (**PSPNet** pre-trained on ImageNet) with supervised learning => stronger representation
 		- Support/Query Image => Encoder-Decoder (**PSPNet**) => Linear clasifier with Support Mask (Support only) => Classifier (Support only) => [Classifier weight `Q`, Query feature `K`, Query feature `V`]
 	- **_Second stage_**: meta-train the Classifier Weight Transformer (CWT) only (as the encoder-decoder capapble to capture generalization of unseen class)
-		- {Q, K, V} => Skip_Connection[Linear => MHSA => Norm] => Conv operation with `Q` => Prediction Mask
+		- {Q, K, V} => Skip[Linear => MHSA => Norm] => Conv operation with `Q` => Prediction Mask
 + **Code**: https://github.com/zhiheLu/CWT-for-FSS
 
 ### Few-shot Transformation of Common Actions into Time and Space
