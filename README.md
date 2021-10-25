@@ -6,8 +6,8 @@ The main purpose of this list is to review and recap only the main approach/pipe
 The paper summarization list will be updated frequently.
 
 ## Table of contents
-* [**Basic Transformer**](#Basic-Transformer)
-	* [Original Transformer](#Original-Transformer)
+* [**Standard Transformer**](#Standard-Transformer)
+	* [Basic Transformer](#Basic-Transformer)
 	* [ViT (Vision Transformer)](#ViT-Vision-Transformer)
 	* [VTN (Video Transformer Network)](#VTN-Video-Transformer-Network)
 	* [ViTGAN (Vision Transformer GAN)](#VitGAN-Vision-Transformer-GAN)
