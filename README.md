@@ -53,7 +53,7 @@ This section introduces original transformer architecture in NLP as well as its 
 + **Input**: 
 	- Sequence embedding (e.g. word embeddings of a sentence)
 	- **Positional Encoding (PE)** => encode the _positions of embedding word within the sentence_ in the input of Encoder/Decoder block
-		- [_Detailed explanation_](https://kazemnejad.com/blog/transformer_architecture_positional_encoding/) of PE 
+		- Read [here](https://kazemnejad.com/blog/transformer_architecture_positional_encoding/) for detailed explanation of PE 
 + **Encoder**:
 	- Embedding words => Skip[**_MHSA_** => Norm] => Skip[**_FFN_** => Norm] => _Patch encoding_
 		- **_MHSA_**: Multi-Head Self Attention  
