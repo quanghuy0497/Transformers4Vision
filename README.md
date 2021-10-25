@@ -57,6 +57,8 @@ This section introduces original transformer architecture in NLP as well as its 
 + **Encoder**:
 	- Embedding words => Skip[**_MHSA_** => Norm] => Skip[**_FFN_** => Norm] => _Patch encoding_
 		- **_MHSA_**: Multi-Head Self Attention  
+			- For the general explanation about MHSA and Transformer, you can look at [here](https://github.com/quanghuy0497/Deep-Learning-Specialization/tree/main/Course%205%20-%20Sequence%20Models#transformer-network-1) (note from the Deep Learning Specialization courses, taught by Andrew Ng)
+				- You can also look at [here](https://towardsdatascience.com/transformers-explained-visually-part-3-multi-head-attention-deep-dive-1c1ff1024853) (English) or [here](https://phamdinhkhanh.github.io/2019/06/18/AttentionLayer.html) (Vienamese) for further explanation in detail about how Multi-Head Self Attention work.  
 			![](Images/MHSA.png)  
 		- **_FFN_**: FeedForward Neural Network
 	+ Repeat N times (N usually 6)
@@ -66,10 +68,8 @@ This section introduces original transformer architecture in NLP as well as its 
 		- _Patch encoding_ (put in the middle of the Decoder)
 	- (Input + Positional Encoding) => Skip[**_MHSA_** + Norm] => Skip[(+ _Patch encoding_) => **_MHSA_** => Norm] => Skip[**_FFN_** + Norm] => Linear => Softmax => Decoder Output
 	- Using the decoder output as the input for next round, repeat N times (N ussually 6)
-+ [Read here](https://github.com/quanghuy0497/Deep-Learning-Specialization/tree/main/Course%205%20-%20Sequence%20Models#transformer-network-1) to learn in detail about the MHSA and Transformer architectures
-	+ Also [here](https://phamdinhkhanh.github.io/2019/06/18/AttentionLayer.html) if you prefer detailed explanation in Vienamese
-	+ Computational complexity between Self-Attention; Conv and RNN:  
-		![](Images/complexity.png)  
++ Computational complexity between Self-Attention; Conv and RNN:  
+	![](Images/complexity.png)  
 + **Codes**: https://github.com/SamLynnEvans/Transformer
 
 ### ViT (Vision Transformer)
@@ -85,7 +85,7 @@ This section introduces original transformer architecture in NLP as well as its 
 + **Good video explanation**: https://www.youtube.com/watch?v=HZ4j_U3FC94
 + **Code**: https://github.com/lucidrains/vit-pytorch
 
-### VTN (Video Transformet Network)
+### VTN (Video Transformer Network)
 + **Paper**: https://arxiv.org/pdf/2102.00719.pdf  
 ![](Images/VTN.png)  
 + Based on Longformer - transformer-based model can process a long sequence of thousands of tokens
