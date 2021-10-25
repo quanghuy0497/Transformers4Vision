@@ -6,7 +6,7 @@ The main purpose of this list is to review and recap only the main approach/pipe
 The paper summarization list will be updated frequently.
 
 ## Table of contents
-* [**Standard Transformer**](#Standard-Transformer)
+* [**Basic Transformer**](#Basic-Transformer)
 	* [Original Transformer](#Original-Transformer)
 	* [ViT (Vision Transformer)](#ViT-Vision-Transformer)
 	* [VTN (Video Transformer Network)](#VTN-Video-Transformer-Network)
@@ -47,7 +47,7 @@ The paper summarization list will be updated frequently.
 ## **Standard Transformer**
 This section introduces original transformer architecture in NLP as well as its versions in Computer Vision, including ViT for image classification, VTN for video classification, and ViTGAN for the generative adversarial network. Finally, a deep comparision between ViT and ResNet is introduced, to see deep down if the anttention-based model is similar to the Conv-based model.
 
-### Original Transformer
+### Basic Transformer
 + **Paper**: https://arxiv.org/pdf/1706.03762.pdf
 ![](Images/Transformer.png)  
 + **Input**: 
