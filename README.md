@@ -694,4 +694,4 @@ This section introduces transformer-based architecture for few-shot learning, ma
 
 <br><br>
 <br><br>
-These notes were created by [quanghuy0497](https://github.com/quanghuy0497/Transformer4Vision)@2021
+These notes were created by [quanghuy0497](https://quanghuy0497.github.io/)@2021
